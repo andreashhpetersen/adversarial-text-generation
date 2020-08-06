@@ -63,14 +63,22 @@ class DataManager:
             idx2el[len(idx2el)] = el
         return el2idx, idx2el
 
-    def map_to(self, X, mapping):
+    def to_sentence(self, idxs, as_list=False):
+        if type(idxs) == torch.Tensor:
+            idxs = idxs.tolist()
+
+        if as_list:
+            return [self.idx2word[i] for i in idxs]
+
+        return ' '.join([self.idx2word[i] for i in idxs])
+
+    def to_idxs(self, X):
         """
         Convert a list X (eg. tags or words) to a list of indicies
         """
-        if type(X) == torch.Tensor:
-            return [mapping.get(x.item(), self.UNK_IDX) for x in X]
-        else:
-            return [mapping.get(x, self.UNK_IDX) for x in X]
+        if not isinstance(X, list):
+            X = X.split(' ')
+        return torch.tensor([self.word2idx.get(x, self.UNK_IDX) for x in X])
 
     def batchify(self, X, batch_sz=32):
         """
@@ -138,7 +146,7 @@ class DataManager:
 
         :return:          list of batches
         """
-        X = [self.map_to(sen, self.word2idx) for sen in data]
+        X = [self.to_idxs(sen, self.word2idx) for sen in data]
         return self.batchify(X, batch_sz=batch_sz)
 
     def get_batched_data(self, batch_sz=32):
@@ -146,3 +154,8 @@ class DataManager:
         test_d = self.prepare_data(self.test_data, batch_sz=batch_sz)
         dev_d = self.prepare_data(self.dev_data, batch_sz=batch_sz)
         return train_d, test_d, dev_d
+
+    def compare(self, y_true, y_pred):
+        y_true = self.to_sentence(y_true, as_list=True)
+        y_pred = self.to_sentence(y_pred, as_list=True)
+        return [(yt, yp, yt == yp) for yt, yp in zip(y_true, y_pred)]
