@@ -57,7 +57,8 @@ class TransformerModel(nn.Module):
 
     def forward(self, src):
         if self.src_mask is None or self.src_mask.size(0) != len(src):
-            mask = self._generate_square_subsequent_mask(len(src))
+            device = src.device
+            mask = self._generate_square_subsequent_mask(len(src)).to(device)
             self.src_mask = mask
 
         src = self.encoder(src) * math.sqrt(self.ninp)
@@ -67,12 +68,13 @@ class TransformerModel(nn.Module):
         return output
 
     def predict(self, inp):
+        device = inp.device
         remove_batch = False
         if inp.dim() == 1:
-            inp = inp.view(-1,1)
+            inp = inp.view(-1, 1)
             remove_batch = True
 
-        out = self.forward(inp)
+        out = self.forward(inp.to(device))
         probs = F.softmax(out, dim=2)
         if remove_batch:
             probs = probs.view(probs.shape[0], -1)
