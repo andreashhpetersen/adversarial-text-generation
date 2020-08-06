@@ -130,3 +130,10 @@ print('=' * 89)
 print('| End of training | test loss {:5.2f} | test ppl {:8.2f}'.format(
     test_loss, math.exp(test_loss)))
 print('=' * 89)
+
+
+def human_eval(i):
+    ex = test_d[i][:, 1].to(device)
+    print(' '.join(dm.idx2word[w.item()] for w in ex[ex != 0]))
+    y_pred = model.predict(ex)
+    print(' '.join(dm.idx2word[w.item()] for w in y_pred))

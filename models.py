@@ -68,12 +68,13 @@ class TransformerModel(nn.Module):
         return output
 
     def predict(self, inp):
+        device = inp.device
         remove_batch = False
         if inp.dim() == 1:
-            inp = inp.view(-1,1)
+            inp = inp.view(-1, 1)
             remove_batch = True
 
-        out = self.forward(inp)
+        out = self.forward(inp.to(device))
         probs = F.softmax(out, dim=2)
         if remove_batch:
             probs = probs.view(probs.shape[0], -1)
