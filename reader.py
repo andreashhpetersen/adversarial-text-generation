@@ -146,7 +146,7 @@ class DataManager:
 
         :return:          list of batches
         """
-        X = [self.to_idxs(sen, self.word2idx) for sen in data]
+        X = [self.to_idxs(sen) for sen in data]
         return self.batchify(X, batch_sz=batch_sz)
 
     def get_batched_data(self, batch_sz=32):
