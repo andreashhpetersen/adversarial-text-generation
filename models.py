@@ -79,7 +79,7 @@ class TransformerModel(nn.Module):
         return torch.argmax(probs, dim=1)[inp.view(-1) != 0]
 
     def predict_sentence(self, inp, idx2word):
-        return ' '.join(idx2word[w] for w in self.predict(inp))
+        return ' '.join(idx2word[w.item()] for w in self.predict(inp))
 
     def predict_and_compare(self, inp, idx2word):
         y_pred = self.predict_sentence(inp, idx2word).split(' ')
