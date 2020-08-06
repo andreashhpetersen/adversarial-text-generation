@@ -100,19 +100,24 @@ best_val_loss = float("inf")
 epochs = 20  # The number of epochs
 best_model = None
 
-for epoch in range(1, epochs + 1):
-    epoch_start_time = time.time()
-    train()
-    val_loss = evaluate(model, dev_d)
-    print('-' * 89)
-    print('| end of epoch {:3d} | time: {:5.2f}s | valid loss {:5.2f} | '
-          'valid ppl {:8.2f}'.format(epoch, (time.time() - epoch_start_time),
-                                     val_loss, math.exp(val_loss)))
-    print('-' * 89)
+# You may bail early using ctrl+c
+try:
+    for epoch in range(1, epochs + 1):
+        epoch_start_time = time.time()
+        train()
+        val_loss = evaluate(model, dev_d)
+        print('-' * 89)
+        print('| end of epoch {:3d} | time: {:5.2f}s | valid loss {:5.2f} | '
+              'valid ppl {:8.2f}'.format(epoch, (time.time() - epoch_start_time),
+                                         val_loss, math.exp(val_loss)))
+        print('-' * 89)
 
-    if val_loss < best_val_loss:
-        best_val_loss = val_loss
-        best_model = model
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            best_model = model
+except KeyboardInterrupt:
+    print('-' * 89)
+    print('Exiting from training early')
 
 ######################################################################
 # Evaluate the model with the test dataset
