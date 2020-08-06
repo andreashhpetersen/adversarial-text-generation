@@ -79,12 +79,3 @@ class TransformerModel(nn.Module):
         if remove_batch:
             probs = probs.view(probs.shape[0], -1)
         return torch.argmax(probs, dim=1)[inp.view(-1) != 0]
-
-    def predict_sentence(self, inp, idx2word):
-        return ' '.join(idx2word[w.item()] for w in self.predict(inp))
-
-    def predict_and_compare(self, inp, idx2word):
-        y_pred = self.predict_sentence(inp, idx2word).split(' ')
-        inp = inp.view(-1)
-        y_true = [idx2word[w] for w in inp[inp != 0]]
-        return [(yt, yp, yt == yp) for yt, yp in zip(y_true, y_pred)]
