@@ -68,9 +68,9 @@ class DataManager:
         Convert a list X (eg. tags or words) to a list of indicies
         """
         if type(X) == torch.Tensor:
-            return [mapping.get(x.item(), dm.UNK_IDX) for x in X]
+            return [mapping.get(x.item(), self.UNK_IDX) for x in X]
         else:
-            return [mapping.get(x, dm.UNK_IDX) for x in X]
+            return [mapping.get(x, self.UNK_IDX) for x in X]
 
     def batchify(self, X, batch_sz=32):
         """
