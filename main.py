@@ -34,7 +34,7 @@ nhid = 200  # the dimension of the feedforward network model in nn.TransformerEn
 nlayers = 4  # the number of nn.TransformerEncoderLayer in nn.TransformerEncoder
 nhead = 4  # the number of heads in the multiheadattention models
 dropout = 0.2  # the dropout value
-model = TransformerModel(ntokens, emsize, nhead, nhid, nlayers, embeddings, dropout).to(device)
+model = TransformerModel2(ntokens, emsize, nhead, nhid, nlayers, embeddings, dropout).to(device)
 
 ######################################################################
 # Run the model
@@ -59,6 +59,7 @@ def train():
         optimizer.zero_grad()
         # import code; code.interact(local=dict(globals(), **locals()))
         output = model(data)
+        import ipdb; ipdb.set_trace()
         loss = criterion(output.view(-1, ntokens), targets)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
@@ -97,7 +98,7 @@ def evaluate(eval_model, data_source):
 # we've seen so far. Adjust the learning rate after each epoch.
 
 best_val_loss = float("inf")
-epochs = 20  # The number of epochs
+epochs = 5  # The number of epochs
 best_model = None
 
 # You may bail early using ctrl+c
