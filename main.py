@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 from random import shuffle
 
-from models import TransformerModel
+from models import TransformerModel, Generator, Discriminator
 from reader import DataManager
 
 from polyglot.mapping import Embedding, CaseExpander

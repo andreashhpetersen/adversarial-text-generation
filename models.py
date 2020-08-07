@@ -55,7 +55,7 @@ class TransformerModel(nn.Module):
         self.decoder.bias.data.zero_()
         self.decoder.weight.data.uniform_(-initrange, initrange)
 
-    def forward(self, src):
+    def encode(self, src):
         if self.src_mask is None or self.src_mask.size(0) != len(src):
             device = src.device
             mask = self._generate_square_subsequent_mask(len(src)).to(device)
@@ -63,8 +63,15 @@ class TransformerModel(nn.Module):
 
         src = self.encoder(src) * math.sqrt(self.ninp)
         src = self.pos_encoder(src)
-        output = self.transformer_encoder(src, self.src_mask)
-        output = self.decoder(output)
+        encoded = self.transformer_encoder(src, self.src_mask)
+        return encoded
+
+    def decode(self, encoded):
+        return self.decoder(encoded)
+
+    def forward(self, src):
+        encoded = self.encode(src)
+        output = self.decode(encoded)
         return output
 
     def predict(self, inp):
