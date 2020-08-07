@@ -17,7 +17,8 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # from polyglot.downloader import downloader
 # downloader.download('embeddings2.en')
 
-embedding_path = str(Path.home()) + '/polyglot_data/embeddings2/en/embeddings_pkl.tar.bz2'
+poly_path =  '/polyglot_data/embeddings2/en/embeddings_pkl.tar.bz2'
+embedding_path = str(Path.home()) + poly_path
 polyglot_emb = Embedding.load(embedding_path)
 polyglot_emb.apply_expansion(CaseExpander)
 emsize = polyglot_emb.shape[1]
@@ -34,7 +35,7 @@ nhid = 200  # the dimension of the feedforward network model in nn.TransformerEn
 nlayers = 4  # the number of nn.TransformerEncoderLayer in nn.TransformerEncoder
 nhead = 4  # the number of heads in the multiheadattention models
 dropout = 0.2  # the dropout value
-model = TransformerModel2(ntokens, emsize, nhead, nhid, nlayers, embeddings, dropout).to(device)
+model = TransformerModel(ntokens, emsize, nhead, nhid, nlayers, embeddings, dropout).to(device)
 
 ######################################################################
 # Run the model
@@ -59,7 +60,6 @@ def train():
         optimizer.zero_grad()
         # import code; code.interact(local=dict(globals(), **locals()))
         output = model(data)
-        import ipdb; ipdb.set_trace()
         loss = criterion(output.view(-1, ntokens), targets)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)

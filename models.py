@@ -110,18 +110,19 @@ class Generator(nn.Module):
 
 
 class Discriminator(nn.Module):
-    def __init__(self, enc_sz):
+    def __init__(self, ntokens, max_seq_len=128, hid_sz=64):
+        super(Discriminator, self).__init__()
 
-        # Number of input features is 12.
-        self.layer_1 = nn.Linear(enc_sz, 64)
-        self.layer_2 = nn.Linear(64, 64)
-        self.layer_out = nn.Linear(64, 1)
+        self.layer_1 = nn.Linear(ntokens, hid_sz)
+        self.layer_2 = nn.Linear(max_seq_len*hid_sz, hid_sz)
+        self.layer_out = nn.Linear(hid_sz, 1)
 
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(p=0.1)
 
     def forward(self, inputs):
         x = self.relu(self.layer_1(inputs))
+        x = x.view(1, -1)
         x = self.relu(self.layer_2(x))
         x = self.dropout(x)
         x = self.layer_out(x)
