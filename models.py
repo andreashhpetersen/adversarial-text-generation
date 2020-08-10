@@ -34,7 +34,7 @@ class TransformerModel(nn.Module):
         if embeddings is not None:
             assert ntoken == embeddings.shape[0]
             assert ninp == embeddings.shape[1]
-            self.encoder.load_state_dict({ 'weight': embeddings })
+            self.encoder.load_state_dict({'weight': embeddings})
 
         self.pos_encoder = PositionalEncoding(ninp, dropout)
         encoder_layers = TransformerEncoderLayer(ninp, nhead, nhid, dropout)
@@ -96,7 +96,12 @@ class Generator(nn.Module):
         self.max_seq_len = max_seq_len
 
         self.embeddings = nn.Embedding(voc_sz, emb_sz, padding_idx=0)
-        self.sequence_constructor = nn.Linear(emb_sz*inp_sz, max_seq_len*emb_sz)
+        if embs is not None:
+            assert voc_sz == embs.shape[0]
+            assert emb_sz == embs.shape[1]
+            self.embeddings.load_state_dict({'weight': embs})
+
+        self.sequence_constructor = nn.Linear(emb_sz * inp_sz, max_seq_len * emb_sz)
         self.recurrent = nn.GRU(emb_sz, hid_sz)
         self.linear = nn.Linear(hid_sz, out_sz)
 
@@ -104,10 +109,13 @@ class Generator(nn.Module):
         return torch.randn(1, batch_sz, self.hid_sz)
 
     def forward(self, inp):
+        print(inp.size())
+        print(inp.shape)
         batch_sz = inp.shape[1]
         self.hidden = self.init_hidden(batch_sz)
 
-        embs = self.embeddings(inp).view(1, -1)     # concat embeddings
+        embs = self.embeddings(inp).view(batch_sz, -1)  # concat embeddings
+        print(embs.size())
         X = F.leaky_relu(self.sequence_constructor(embs))
         X = X.view(self.max_seq_len, batch_sz, -1)  # make sequence
         X, _ = self.recurrent(X, self.hidden)
@@ -116,22 +124,44 @@ class Generator(nn.Module):
         return X
 
 
+class MBGenerator(nn.Module):
+    def __init__(self, embeddings, hidden_size=128):
+        super(MBGenerator, self).__init__()
+
+        vocabulary_size = embeddings.size(0)
+        embedding_size = embeddings.size(1)
+        self.embeddings = nn.Embedding(vocabulary_size, embedding_size, padding_idx=0)
+        self.embeddings.load_state_dict({'weight': embeddings})
+
+        self.layer1 = nn.Linear(embedding_size, hidden_size)
+        self.layer2 = nn.Linear(hidden_size, embedding_size)
+
+    def forward(self, x):
+        x = self.layer1(x)
+        x = self.layer2(x)
+
+        return x
+
+
 class Discriminator(nn.Module):
-    def __init__(self, ntokens, max_seq_len=128, hid_sz=64):
+    def __init__(self, embedding_dim, batch_size, max_seq_len=128, hid_sz=64):
         super(Discriminator, self).__init__()
 
-        self.layer_1 = nn.Linear(ntokens, hid_sz)
-        self.layer_2 = nn.Linear(max_seq_len*hid_sz, hid_sz)
-        self.layer_out = nn.Linear(hid_sz, 1)
+        self.layer_1 = nn.Linear(embedding_dim, hid_sz)
+        self.layer_2 = nn.Linear(max_seq_len * hid_sz * batch_size, hid_sz)
+        self.layer_out = nn.Linear(hid_sz, batch_size)
 
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(p=0.1)
+        self.sigmoid = nn.Sigmoid()
 
     def forward(self, inputs):
         x = self.relu(self.layer_1(inputs))
-        x = x.view(1, -1)
+        x = x.view(-1)
+        print(x.size())
         x = self.relu(self.layer_2(x))
         x = self.dropout(x)
         x = self.layer_out(x)
+        x = self.sigmoid(x)
 
         return x
