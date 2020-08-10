@@ -109,6 +109,57 @@ class SimpleGenerator(nn.Module):
 
         return x
 
+class EncoderGenerator(nn.Module):
+    def __init__(self, ntoken, ninp, nhead, nhid, nlayers, embeddings=None, dropout=0.5):
+        super(EncoderGenerator, self).__init__()
+        from torch.nn import TransformerEncoder, TransformerEncoderLayer
+        self.model_type = 'Transformer'
+        self.src_mask = None
+
+        self.encoder = nn.Embedding(ntoken, ninp, padding_idx=0)
+        if embeddings is not None:
+            assert ntoken == embeddings.shape[0]
+            assert ninp == embeddings.shape[1]
+            self.encoder.load_state_dict({'weight': embeddings})
+
+        self.pos_encoder = PositionalEncoding(ninp, dropout)
+        encoder_layers = TransformerEncoderLayer(ninp, nhead, nhid, dropout)
+        self.transformer_encoder = TransformerEncoder(encoder_layers, nlayers)
+        self.ninp = ninp
+        self.decoder = nn.Linear(ninp, ninp)
+
+        self.init_weights()
+
+    def _generate_square_subsequent_mask(self, sz):
+        mask = (torch.triu(torch.ones(sz, sz)) == 1).transpose(0, 1)
+        mask = mask.float().masked_fill(mask == 0, float('-inf')).masked_fill(mask == 1, float(0.0))
+        return mask
+
+    def init_weights(self):
+        initrange = 0.1
+        self.encoder.weight.data.uniform_(-initrange, initrange)
+        self.decoder.bias.data.zero_()
+        self.decoder.weight.data.uniform_(-initrange, initrange)
+
+    def encode(self, src):
+        if self.src_mask is None or self.src_mask.size(0) != len(src):
+            device = src.device
+            mask = self._generate_square_subsequent_mask(len(src)).to(device)
+            self.src_mask = mask
+
+        src = self.encoder(src) * math.sqrt(self.ninp)
+        src = self.pos_encoder(src)
+        encoded = self.transformer_encoder(src, self.src_mask)
+        return encoded
+
+    def decode(self, encoded):
+        return self.decoder(encoded)
+
+    def forward(self, src):
+        encoded = self.encode(src)
+        output = self.decode(encoded)
+        return output
+
 
 class EncoderDiscriminator(nn.Module):
     def __init__(self, embedding_size, sentence_size, head_count, hidden_size, layer_count, dropout=0.5):
@@ -151,17 +202,18 @@ class EncoderDiscriminator(nn.Module):
         x = x.permute(1, 0, 2)  # (batch, sentence, embedding)
         x = x.reshape(-1, sentence_size * embedding_size)  # (batch, sentence * embedding)
         x = self.decoder(x)
-        x = F.sigmoid(x)
+        x = F.sigmoid(x).view(-1)
 
         return x
 
 
 class SimpleDiscriminator(nn.Module):
-    def __init__(self, embedding_size, sentence_size, hidden_size=512):
+    def __init__(self, embedding_size, sentence_size, hidden_size=1024):
         super(SimpleDiscriminator, self).__init__()
 
         self.layer1 = nn.Linear(embedding_size * sentence_size, hidden_size)
-        self.layer2 = nn.Linear(hidden_size, 1)
+        self.layer2 = nn.Linear(hidden_size, hidden_size)
+        self.layer3 = nn.Linear(hidden_size, 1)
         # doesn't work
 
     def forward(self, x):
@@ -175,6 +227,8 @@ class SimpleDiscriminator(nn.Module):
         x = self.layer1(x)
         x = F.leaky_relu(x)
         x = self.layer2(x)
+        x = F.leaky_relu(x)
+        x = self.layer3(x)
         x = F.sigmoid(x)
 
         return x

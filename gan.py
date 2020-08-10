@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from IPython.core.debugger import set_trace
 import torch.nn.functional as F
 
-from models import TransformerModel, SimpleGenerator, SimpleDiscriminator, EncoderDiscriminator
+from models import TransformerModel, SimpleGenerator, SimpleDiscriminator, EncoderDiscriminator, EncoderGenerator
 from reader import DataManager
 
 from polyglot.mapping import Embedding, CaseExpander
@@ -60,7 +60,8 @@ def random_words(batch):
     return rand
 
 source_model = load_source_model()
-generator = SimpleGenerator(embeddings).to(device)
+generator = EncoderGenerator(ntokens, emsize, nhead, nhid, nlayers, embeddings, dropout).to(device)
+# generator = SimpleGenerator(embeddings).to(device)
 discriminator = EncoderDiscriminator(embeddings.size(1), dm.max_seq_len, nhead, nhid, nlayers, dropout).to(device)
 # discriminator = SimpleDiscriminator(embeddings.size(1), dm.max_seq_len).to(device)
 
