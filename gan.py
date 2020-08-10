@@ -53,10 +53,10 @@ def load_source_model():
 
 def random_words(batch):
     rand = torch.randint(1, ntokens, batch.size(), device=device)
-    for i in range(batch.size(0)):
-        for j in range(batch.size(1)):
-            if batch[i][j] == 0:
-                rand[i][j] = 0
+    # for i in range(batch.size(0)):
+    #     for j in range(batch.size(1)):
+    #         if batch[i][j] == 0:
+    #             rand[i][j] = 0
     return rand
 
 source_model = load_source_model()
