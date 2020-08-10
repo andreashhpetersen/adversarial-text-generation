@@ -123,9 +123,9 @@ def train_multiple_epochs():
     return best_model
 
 
-# model.load_state_dict(torch.load("saved_models/5epochs_with_max_seq_len128.pt"))
-# best_model = model
-best_model = train_multiple_epochs()
+model.load_state_dict(torch.load("saved_models/20epochs_with_max_seq_len128.pt"))
+best_model = model
+# best_model = train_multiple_epochs()
 
 ######################################################################
 # Evaluate the model with the test dataset

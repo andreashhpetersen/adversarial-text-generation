@@ -9,7 +9,7 @@ class DataManager:
     SOS_TOK, EOS_TOK, UNK_TOK = '<SOS>', '<EOS>', '<unk>'
     PAD_TOK, PAD_IDX = '<PAD>', 0
 
-    def __init__(self, root_dir='./data/', lang='en', ft='conllu', max_seq_len=128):
+    def __init__(self, root_dir='./data/', lang='en', ft='conllu', max_seq_len=10):
         data_dir = f'{root_dir}{lang}'
         self.train_path = f'{data_dir}/train.{ft}'
         self.test_path = f'{data_dir}/test.{ft}'
