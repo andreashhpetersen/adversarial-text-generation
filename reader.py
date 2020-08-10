@@ -9,7 +9,7 @@ class DataManager:
     SOS_TOK, EOS_TOK, UNK_TOK = '<SOS>', '<EOS>', '<unk>'
     PAD_TOK, PAD_IDX = '<PAD>', 0
 
-    def __init__(self, root_dir='./data/', lang='en', ft='conllu'):
+    def __init__(self, root_dir='./data/', lang='en', ft='conllu', max_seq_len=128):
         data_dir = f'{root_dir}{lang}'
         self.train_path = f'{data_dir}/train.{ft}'
         self.test_path = f'{data_dir}/test.{ft}'
@@ -24,7 +24,11 @@ class DataManager:
         self.idx2word = mappings[1]
         self.UNK_IDX = self.word2idx[self.UNK_TOK]
 
+        self.max_seq_len = max_seq_len
+
     def get_sentences(self, filename):
+        """
+        """
         sentences = []
         words, all_words = [], { self.UNK_TOK }
         with open(filename, 'r') as f:
@@ -125,7 +129,7 @@ class DataManager:
             lengths = [len(x) for x in batch]
 
             # pad it
-            padded = torch.zeros(batch_sz, lengths[0], dtype=torch.long) + self.PAD_IDX
+            padded = torch.zeros(batch_sz, self.max_seq_len, dtype=torch.long) + self.PAD_IDX
             for j in range(batch_sz):
                 padded[j, range(lengths[j])] = torch.tensor(batch[j], dtype=torch.long)
 
@@ -144,7 +148,7 @@ class DataManager:
 
         :return:          list of batches
         """
-        X = [self.to_idxs(sen) for sen in data]
+        X = [self.to_idxs(sen) for sen in data if len(sen) < self.max_seq_len]
         return self.batchify(X, batch_sz=batch_sz)
 
     def get_batched_data(self, batch_sz=32):
