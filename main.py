@@ -17,7 +17,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # from polyglot.downloader import downloader
 # downloader.download('embeddings2.en')
 
-poly_path =  '/polyglot_data/embeddings2/en/embeddings_pkl.tar.bz2'
+poly_path = '/polyglot_data/embeddings2/en/embeddings_pkl.tar.bz2'
 embedding_path = str(Path.home()) + poly_path
 polyglot_emb = Embedding.load(embedding_path)
 polyglot_emb.apply_expansion(CaseExpander)
@@ -47,8 +47,8 @@ lr = 0.05  # learning rate
 optimizer = torch.optim.SGD(model.parameters(), lr=lr)
 
 
-def train():
-    model.train()  # Turn on the train mode
+def train_epoch(epoch):
+    model.train()  # Turn on the training mode
     total_loss = 0.
     start_time = time.time()
     batch_idxs = list(range(0, len(train_d)))
@@ -58,7 +58,6 @@ def train():
         data = batch.to(device)
         targets = batch.reshape(-1).to(device)
         optimizer.zero_grad()
-        # import code; code.interact(local=dict(globals(), **locals()))
         output = model(data)
         loss = criterion(output.view(-1, ntokens), targets)
         loss.backward()
@@ -95,30 +94,38 @@ def evaluate(eval_model, data_source):
 
 ######################################################################
 # Loop over epochs. Save the model if the validation loss is the best
-# we've seen so far. Adjust the learning rate after each epoch.
+# we've seen so far.
 
-best_val_loss = float("inf")
-epochs = 5  # The number of epochs
-best_model = None
+def train_multiple_epochs():
+    best_val_loss = evaluate(model, dev_d)
+    epochs = 20  # The number of epochs
+    best_model = model
 
-# You may bail early using ctrl+c
-try:
-    for epoch in range(1, epochs + 1):
-        epoch_start_time = time.time()
-        train()
-        val_loss = evaluate(model, dev_d)
+    # You may bail early using ctrl+c
+    try:
+        for epoch in range(1, epochs + 1):
+            epoch_start_time = time.time()
+            train_epoch(epoch)
+            val_loss = evaluate(model, dev_d)
+            print('-' * 89)
+            print('| end of epoch {:3d} | time: {:5.2f}s | valid loss {:5.2f} | '
+                  'valid ppl {:8.2f}'.format(epoch, (time.time() - epoch_start_time),
+                                             val_loss, math.exp(val_loss)))
+            print('-' * 89)
+
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
+                best_model = model
+    except KeyboardInterrupt:
         print('-' * 89)
-        print('| end of epoch {:3d} | time: {:5.2f}s | valid loss {:5.2f} | '
-              'valid ppl {:8.2f}'.format(epoch, (time.time() - epoch_start_time),
-                                         val_loss, math.exp(val_loss)))
-        print('-' * 89)
+        print('Exiting from training early')
 
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
-            best_model = model
-except KeyboardInterrupt:
-    print('-' * 89)
-    print('Exiting from training early')
+    return best_model
+
+
+# model.load_state_dict(torch.load("saved_models/5epochs_with_max_seq_len128.pt"))
+# best_model = model
+best_model = train_multiple_epochs()
 
 ######################################################################
 # Evaluate the model with the test dataset
@@ -128,13 +135,16 @@ except KeyboardInterrupt:
 
 test_loss = evaluate(best_model, test_d)
 print('=' * 89)
-print('| End of training | test loss {:5.2f} | test ppl {:8.2f}'.format(
-    test_loss, math.exp(test_loss)))
+# print('| End of training | test loss {:5.2f} | test ppl {:8.2f}'.format(
+#     test_loss, math.exp(test_loss)))
+print('| End of training | test loss {:5.2f}'.format(test_loss))
 print('=' * 89)
 
 
 def human_eval(i):
     ex = test_d[i][:, 1].to(device)
+    print("Actual:")
     print(' '.join(dm.idx2word[w.item()] for w in ex[ex != 0]))
     y_pred = model.predict(ex)
+    print("Predicted:")
     print(' '.join(dm.idx2word[w.item()] for w in y_pred))
