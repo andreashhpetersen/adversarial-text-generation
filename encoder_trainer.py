@@ -32,8 +32,8 @@ for w, i in dm.word2idx.items():
     else:
         embeddings[i] = torch.randn(emsize, dtype=torch.float)
 
-encoder = EncoderRNN(voc_sz, emsize, embeddings=embeddings)
-decoder = AttnDecoderRNN(emsize, voc_sz, embeddings=embeddings, max_length=MAX_LENGTH)
+encoder = EncoderRNN(voc_sz, emsize, embeddings=embeddings).to(device)
+decoder = AttnDecoderRNN(emsize, voc_sz, embeddings=embeddings, max_length=MAX_LENGTH).to(device)
 
 teacher_forcing_ratio = 0.5
 
@@ -46,8 +46,8 @@ def train(batch, encoder, decoder,
     input_length = batch.shape[0]
     target_length = batch.shape[0]
 
-    encoder_hidden = encoder.init_hidden()
-    encoder_outputs = torch.zeros(max_length, encoder.hidden_size)
+    encoder_hidden = encoder.init_hidden().to(device)
+    encoder_outputs = torch.zeros(max_length, encoder.hidden_size, device=device)
 
     loss = 0
 
@@ -56,7 +56,7 @@ def train(batch, encoder, decoder,
             batch[ei], encoder_hidden)
         encoder_outputs[ei] += encoder_output[0,0]
 
-    decoder_input = torch.full((1, ), dm.SOS_IDX, dtype=torch.long)
+    decoder_input = torch.full((1, ), dm.SOS_IDX, dtype=torch.long, device=device)
     decoder_hidden = encoder_hidden
 
     teacher_forcing_ratio = 0.5
@@ -105,7 +105,7 @@ def trainIters(encoder, decoder, n_iters,
     data = [random.choice(train_d) for _ in range(n_iters)]
     for epoch in range(1, n_iters + 1):
 
-        sentence = data[epoch - 1]
+        sentence = data[epoch - 1].to(device)
         loss = train(sentence, encoder, decoder,
                      optim_enc, optim_dec, criterion)
 
@@ -173,3 +173,5 @@ def evaluateRandomly(encoder, decoder, n=10):
         output_sentence = ' '.join(output_words)
         print('<', output_sentence)
         print('')
+
+trainIters(encoder, decoder, 75000)
