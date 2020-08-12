@@ -82,17 +82,17 @@ class TransformerModel(nn.Module):
 
 
 class EncoderRNN(nn.Module):
-    def __init__(self, voc_sz, hidden_size, embeddings=None):
+    def __init__(self, voc_sz, emb_sz, hid_sz, embeddings=None):
         super(EncoderRNN, self).__init__()
-        self.hidden_size = hidden_size
+        self.hid_sz = hid_sz
 
-        self.embedding = nn.Embedding(voc_sz, hidden_size, padding_idx=0)
+        self.embedding = nn.Embedding(voc_sz, emb_sz, padding_idx=0)
         if embeddings is not None:
             assert voc_sz == embeddings.shape[0]
-            assert hidden_size == embeddings.shape[1]
+            assert emb_sz == embeddings.shape[1]
             self.embedding.load_state_dict({'weight': embeddings})
 
-        self.gru = nn.GRU(hidden_size, hidden_size)
+        self.gru = nn.GRU(emb_sz, hid_sz)
 
     def forward(self, input, hidden):
         embedded = self.embedding(input).view(1, 1, -1)
@@ -100,28 +100,28 @@ class EncoderRNN(nn.Module):
         return output, hidden
 
     def init_hidden(self):
-        return torch.zeros(1, 1, self.hidden_size)
+        return torch.zeros(1, 1, self.hid_sz)
 
 
 class AttnDecoderRNN(nn.Module):
-    def __init__(self, hidden_size, voc_sz, embeddings=None, dropout_p=0.1, max_length=128):
+    def __init__(self, hid_sz, voc_sz, emb_sz, embeddings=None, dropout_p=0.1, max_length=128):
         super(AttnDecoderRNN, self).__init__()
-        self.hidden_size = hidden_size
+        self.hid_sz = hid_sz
         self.voc_sz = voc_sz
         self.dropout_p = dropout_p
         self.max_length = max_length
 
-        self.embedding = nn.Embedding(self.voc_sz, self.hidden_size, padding_idx=0)
+        self.embedding = nn.Embedding(self.voc_sz, emb_sz, padding_idx=0)
         if embeddings is not None:
             assert voc_sz == embeddings.shape[0]
-            assert hidden_size == embeddings.shape[1]
+            assert emb_sz == embeddings.shape[1]
             self.embedding.load_state_dict({'weight': embeddings})
 
-        self.attn = nn.Linear(self.hidden_size * 2, self.max_length)
-        self.attn_combine = nn.Linear(self.hidden_size * 2, self.hidden_size)
+        self.attn = nn.Linear(emb_sz + hid_sz, self.max_length)
+        self.attn_combine = nn.Linear(emb_sz + hid_sz, emb_sz)
         self.dropout = nn.Dropout(self.dropout_p)
-        self.gru = nn.GRU(self.hidden_size, self.hidden_size)
-        self.out = nn.Linear(self.hidden_size, self.voc_sz)
+        self.gru = nn.GRU(emb_sz, self.hid_sz)
+        self.out = nn.Linear(self.hid_sz, self.voc_sz)
 
     def forward(self, input, hidden, encoder_outputs):
         embedded = self.embedding(input).view(1, 1, -1)
@@ -142,7 +142,7 @@ class AttnDecoderRNN(nn.Module):
         return output, hidden, attn_weights
 
     def init_hidden(self):
-        return torch.zeros(1, 1, self.hidden_size)
+        return torch.zeros(1, 1, self.hid_sz)
 
 
 class SimpleGenerator(nn.Module):
