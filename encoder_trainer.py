@@ -15,7 +15,7 @@ from pathlib import Path
 
 MAX_LENGTH = 15
 dm = DataManager(max_seq_len=MAX_LENGTH)
-train_d, test_d, dev_d = dm.get_batched_data(batch_sz=8)
+train_d, test_d, dev_d = dm.get_batched_data(batch_sz=64)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 poly_path = '/polyglot_data/embeddings2/en/embeddings_pkl.tar.bz2'
@@ -63,7 +63,6 @@ def train(batch, encoder, decoder,
 
     teacher_forcing_ratio = 0.5
     use_teacher_forcing = True if random.random() < teacher_forcing_ratio else False
-    use_teacher_forcing = False
 
     if use_teacher_forcing:
         # Teacher forcing: Feed the target as the next input
@@ -71,7 +70,7 @@ def train(batch, encoder, decoder,
             decoder_output, decoder_hidden, decoder_attention = decoder(
                 decoder_input, decoder_hidden, encoder_outputs)
             loss += criterion(decoder_output, batch[di])
-            decoder_input = batch[di]  # Teacher forcing
+            decoder_input = batch[di].view(1, -1)  # Teacher forcing
 
     else:
         # Without teacher forcing: use its own predictions as the next input
@@ -132,16 +131,16 @@ def trainIters(encoder, decoder, n_iters,
 
 def evaluate(encoder, decoder, sentence, max_length=MAX_LENGTH):
     with torch.no_grad():
-        input_tensor = dm.to_idxs(sentence).to(device)
-        input_length = input_tensor.size()[0]
-        encoder_hidden = encoder.init_hidden().to(device)
+        input_tensor = dm.to_idxs(sentence).view(-1, 1).to(device)
+        input_length = input_tensor.shape[0]
+        encoder_hidden = encoder.init_hidden(1).to(device)
 
-        encoder_outputs = torch.zeros(max_length, encoder.hid_sz, device=device)
+        encoder_outputs = torch.zeros(max_length, 1, encoder.hid_sz, device=device)
 
         for ei in range(input_length):
             encoder_output, encoder_hidden = encoder(input_tensor[ei],
                                                      encoder_hidden)
-            encoder_outputs[ei] += encoder_output[0, 0]
+            encoder_outputs[ei,:] += encoder_output[0, 0]
 
         decoder_input = torch.tensor([[dm.SOS_IDX]], device=device)  # SOS
 
@@ -161,7 +160,7 @@ def evaluate(encoder, decoder, sentence, max_length=MAX_LENGTH):
             else:
                 decoded_words.append(dm.idx2word[topi.item()])
 
-            decoder_input = topi.squeeze().detach()
+            decoder_input = topi.detach()
 
         return decoded_words, decoder_attentions[:di + 1]
 
@@ -171,9 +170,8 @@ def evaluateRandomly(encoder, decoder, n=10):
         ex = random.choice(test_d)
         ex = dm.to_sentence(ex, as_list=True)[0]
         pair = (ex, ex)
-        print('>', ' '.join(pair[0]))
-        print('=', ' '.join(pair[1]))
-        output_words, attentions = evaluate(encoder, decoder, pair[0])
+        print('>', ' '.join(ex))
+        output_words, attentions = evaluate(encoder, decoder, ex)
         output_sentence = ' '.join(output_words)
         print('<', output_sentence)
         print('')
