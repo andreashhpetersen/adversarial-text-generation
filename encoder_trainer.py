@@ -118,7 +118,7 @@ def trainIters(encoder, decoder, n_iters,
             print_loss_total = 0
             print('%s (%d %d%%) %.4f' % (timeSince(start, epoch / n_iters),
                                          epoch, epoch / n_iters * 100, print_loss_avg))
-            evaluateRandomly(encoder, decoder, n=3)
+            evaluateRandomly(encoder, decoder, 1)
 
         if epoch % plot_every == 0:
             plot_loss_avg = plot_loss_total / plot_every
@@ -130,9 +130,9 @@ def trainIters(encoder, decoder, n_iters,
 
 def evaluate(encoder, decoder, sentence, max_length=MAX_LENGTH):
     with torch.no_grad():
-        input_tensor = dm.to_idxs(sentence)
+        input_tensor = dm.to_idxs(sentence).to(device)
         input_length = input_tensor.size()[0]
-        encoder_hidden = encoder.init_hidden()
+        encoder_hidden = encoder.init_hidden().to(device)
 
         encoder_outputs = torch.zeros(max_length, encoder.hid_sz, device=device)
 
@@ -141,12 +141,12 @@ def evaluate(encoder, decoder, sentence, max_length=MAX_LENGTH):
                                                      encoder_hidden)
             encoder_outputs[ei] += encoder_output[0, 0]
 
-        decoder_input = torch.tensor([[dm.SOS_IDX]])  # SOS
+        decoder_input = torch.tensor([[dm.SOS_IDX]], device=device)  # SOS
 
         decoder_hidden = encoder_hidden
 
         decoded_words = []
-        decoder_attentions = torch.zeros(max_length, max_length)
+        decoder_attentions = torch.zeros(max_length, max_length, device=device)
 
         for di in range(max_length):
             decoder_output, decoder_hidden, decoder_attention = decoder(
@@ -169,11 +169,12 @@ def evaluateRandomly(encoder, decoder, n=10):
         ex = random.choice(test_d)
         ex = dm.to_sentence(ex, as_list=True)[0]
         pair = (ex, ex)
-        print('>', pair[0])
-        print('=', pair[1])
+        print('>', ' '.join(pair[0]))
+        print('=', ' '.join(pair[1]))
         output_words, attentions = evaluate(encoder, decoder, pair[0])
         output_sentence = ' '.join(output_words)
         print('<', output_sentence)
         print('')
 
-trainIters(encoder, decoder, 75000)
+trainIters(encoder, decoder, 20000)
+evaluateRandomly(encoder, decoder)
