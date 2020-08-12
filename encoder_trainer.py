@@ -15,26 +15,26 @@ from pathlib import Path
 
 MAX_LENGTH = 15
 dm = DataManager(max_seq_len=MAX_LENGTH)
-train_d, test_d, dev_d = dm.get_batched_data(batch_sz=1)
+train_d, test_d, dev_d = dm.get_batched_data(batch_sz=8)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 poly_path = '/polyglot_data/embeddings2/en/embeddings_pkl.tar.bz2'
 embedding_path = str(Path.home()) + poly_path
 polyglot_emb = Embedding.load(embedding_path)
 polyglot_emb.apply_expansion(CaseExpander)
-emsize = polyglot_emb.shape[1]
+emb_sz = polyglot_emb.shape[1]
 voc_sz = len(dm.word2idx)  # the size of vocabulary
 
-embeddings = torch.zeros(voc_sz, emsize)
+embeddings = torch.zeros(voc_sz, emb_sz)
 for w, i in dm.word2idx.items():
     if w in polyglot_emb:
         embeddings[i] = torch.tensor(polyglot_emb[w])
     else:
-        embeddings[i] = torch.randn(emsize, dtype=torch.float)
+        embeddings[i] = torch.randn(emb_sz, dtype=torch.float)
 
 hid_sz = 256
-encoder = EncoderRNN(voc_sz, emsize, hid_sz, embeddings=embeddings).to(device)
-decoder = AttnDecoderRNN(hid_sz, voc_sz, emsize, embeddings=embeddings, max_length=MAX_LENGTH).to(device)
+encoder = EncoderRNN(voc_sz, hid_sz, emb_sz, embeddings=embeddings).to(device)
+decoder = AttnDecoderRNN(voc_sz, hid_sz, emb_sz, embeddings=embeddings, max_length=MAX_LENGTH).to(device)
 
 teacher_forcing_ratio = 0.5
 
@@ -46,22 +46,24 @@ def train(batch, encoder, decoder,
 
     input_length = batch.shape[0]
     target_length = batch.shape[0]
+    batch_sz = batch.shape[1]
 
-    encoder_hidden = encoder.init_hidden().to(device)
-    encoder_outputs = torch.zeros(max_length, encoder.hid_sz, device=device)
+    encoder_hidden = encoder.init_hidden(batch_sz).to(device)
+    encoder_outputs = torch.zeros(max_length, batch_sz, encoder.hid_sz, device=device)
 
     loss = 0
 
     for ei in range(input_length):
         encoder_output, encoder_hidden = encoder(
-            batch[ei], encoder_hidden)
-        encoder_outputs[ei] += encoder_output[0,0]
+            batch[ei,:], encoder_hidden)
+        encoder_outputs[ei,:] += encoder_output[0,0]
 
-    decoder_input = torch.full((1, ), dm.SOS_IDX, dtype=torch.long, device=device)
+    decoder_input = torch.full((1, batch_sz), dm.SOS_IDX, dtype=torch.long, device=device)
     decoder_hidden = encoder_hidden
 
     teacher_forcing_ratio = 0.5
     use_teacher_forcing = True if random.random() < teacher_forcing_ratio else False
+    use_teacher_forcing = False
 
     if use_teacher_forcing:
         # Teacher forcing: Feed the target as the next input
@@ -77,11 +79,11 @@ def train(batch, encoder, decoder,
             decoder_output, decoder_hidden, decoder_attention = decoder(
                 decoder_input, decoder_hidden, encoder_outputs)
             topv, topi = decoder_output.topk(1)
-            decoder_input = topi.squeeze().detach()  # detach from history as input
+            decoder_input = topi.view(-1, batch_sz).detach()  # detach from history as input
 
             loss += criterion(decoder_output, batch[di])
-            if decoder_input.item() == dm.EOS_IDX:
-                break
+            # if decoder_input.item() == dm.EOS_IDX:
+            #     break
 
     loss.backward()
 

@@ -82,7 +82,7 @@ class TransformerModel(nn.Module):
 
 
 class EncoderRNN(nn.Module):
-    def __init__(self, voc_sz, emb_sz, hid_sz, embeddings=None):
+    def __init__(self, voc_sz, hid_sz, emb_sz, embeddings=None):
         super(EncoderRNN, self).__init__()
         self.hid_sz = hid_sz
 
@@ -95,16 +95,17 @@ class EncoderRNN(nn.Module):
         self.gru = nn.GRU(emb_sz, hid_sz)
 
     def forward(self, input, hidden):
-        embedded = self.embedding(input).view(1, 1, -1)
+        batch_sz = input.shape[0]
+        embedded = self.embedding(input).view(1, batch_sz, -1)
         output, hidden = self.gru(embedded, hidden)
         return output, hidden
 
-    def init_hidden(self):
-        return torch.zeros(1, 1, self.hid_sz)
+    def init_hidden(self, batch_sz):
+        return torch.zeros(1, batch_sz, self.hid_sz)
 
 
 class AttnDecoderRNN(nn.Module):
-    def __init__(self, hid_sz, voc_sz, emb_sz, embeddings=None, dropout_p=0.1, max_length=128):
+    def __init__(self, voc_sz, hid_sz, emb_sz, embeddings=None, dropout_p=0.1, max_length=128):
         super(AttnDecoderRNN, self).__init__()
         self.hid_sz = hid_sz
         self.voc_sz = voc_sz
@@ -124,15 +125,18 @@ class AttnDecoderRNN(nn.Module):
         self.out = nn.Linear(self.hid_sz, self.voc_sz)
 
     def forward(self, input, hidden, encoder_outputs):
-        embedded = self.embedding(input).view(1, 1, -1)
+        batch_sz = input.shape[1]
+        embedded = self.embedding(input).view(1, batch_sz, -1)
         embedded = self.dropout(embedded)
 
         attn_weights = F.softmax(
             self.attn(torch.cat((embedded[0], hidden[0]), 1)), dim=1)
-        attn_applied = torch.bmm(attn_weights.unsqueeze(0),
-                                 encoder_outputs.unsqueeze(0))
+        encoder_outputs = encoder_outputs.view(batch_sz, encoder_outputs.shape[0], -1)
+        attn_applied = torch.bmm(attn_weights.unsqueeze(1),
+                                 encoder_outputs)
 
-        output = torch.cat((embedded[0], attn_applied[0]), 1)
+        attn_applied = attn_applied.view(batch_sz, -1)
+        output = torch.cat((embedded[0], attn_applied), 1)
         output = self.attn_combine(output).unsqueeze(0)
 
         output = F.relu(output)
@@ -141,8 +145,8 @@ class AttnDecoderRNN(nn.Module):
         output = F.log_softmax(self.out(output[0]), dim=1)
         return output, hidden, attn_weights
 
-    def init_hidden(self):
-        return torch.zeros(1, 1, self.hid_sz)
+    def init_hidden(self, batch_sz):
+        return torch.zeros(1, batch_sz, self.hid_sz)
 
 
 class SimpleGenerator(nn.Module):
