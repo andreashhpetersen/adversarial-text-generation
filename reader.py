@@ -9,7 +9,7 @@ class DataManager:
     SOS_TOK, EOS_TOK, UNK_TOK = '<SOS>', '<EOS>', '<unk>'
     PAD_TOK, PAD_IDX = '<PAD>', 0
 
-    def __init__(self, root_dir='./data/', lang='en', ft='conllu', max_seq_len=10):
+    def __init__(self, root_dir='./data/', lang='en', ft='conllu', min_seq_len=3, max_seq_len=128, one_size=False, normalize_to_max_seq_len=True):
         data_dir = f'{root_dir}{lang}'
         self.train_path = f'{data_dir}/train.{ft}'
         self.test_path = f'{data_dir}/test.{ft}'
@@ -23,14 +23,19 @@ class DataManager:
         self.word2idx = mappings[0]
         self.idx2word = mappings[1]
         self.UNK_IDX = self.word2idx[self.UNK_TOK]
+        self.SOS_IDX = self.word2idx[self.SOS_TOK]
+        self.EOS_IDX = self.word2idx[self.EOS_TOK]
 
         self.max_seq_len = max_seq_len
+        self.min_seq_len = min_seq_len
+        self.one_size = one_size
+        self.normalize_to_max_seq_len = normalize_to_max_seq_len
 
     def get_sentences(self, filename):
         """
         """
         sentences = []
-        words, all_words = [], { self.UNK_TOK }
+        words, all_words = [], { self.UNK_TOK, self.EOS_TOK, self.SOS_TOK }
         with open(filename, 'r') as f:
             lines = f.readlines()
 
@@ -40,6 +45,7 @@ class DataManager:
                 continue
 
             if line == '':
+                words.append(self.EOS_TOK)
                 sentences.append(words)
                 words = []
 
@@ -67,6 +73,11 @@ class DataManager:
 
     def to_sentence(self, idxs, as_list=False):
         if type(idxs) == torch.Tensor:
+            if len(idxs.shape) > 1:
+                return [
+                    self.to_sentence(idxs[:,i], as_list=as_list)
+                    for i in range(idxs.shape[1])
+                ]
             idxs = idxs.tolist()
 
         if as_list:
@@ -129,7 +140,12 @@ class DataManager:
             lengths = [len(x) for x in batch]
 
             # pad it
-            padded = torch.zeros(batch_sz, self.max_seq_len, dtype=torch.long) + self.PAD_IDX
+            if self.normalize_to_max_seq_len:
+                max_len = self.max_seq_len
+            else:
+                max_len = lengths[0]
+
+            padded = torch.zeros(batch_sz, max_len, dtype=torch.long) + self.PAD_IDX
             for j in range(batch_sz):
                 padded[j, range(lengths[j])] = torch.tensor(batch[j], dtype=torch.long)
 
@@ -148,7 +164,13 @@ class DataManager:
 
         :return:          list of batches
         """
-        X = [self.to_idxs(sen) for sen in data if len(sen) < self.max_seq_len]
+        X = [
+            self.to_idxs(sen) for sen in data
+            if len(sen) == self.max_seq_len
+        ] if self.one_size else [
+            self.to_idxs(sen) for sen in data
+            if self.min_seq_len < len(sen) < self.max_seq_len
+        ]
         return self.batchify(X, batch_sz=batch_sz)
 
     def get_batched_data(self, batch_sz=32):

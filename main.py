@@ -10,12 +10,9 @@ from reader import DataManager
 from polyglot.mapping import Embedding, CaseExpander
 from pathlib import Path
 
-dm = DataManager()
+dm = DataManager(normalize_to_max_seq_len=False)
 train_d, test_d, dev_d = dm.get_batched_data(batch_sz=8)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-# from polyglot.downloader import downloader
-# downloader.download('embeddings2.en')
 
 poly_path = '/polyglot_data/embeddings2/en/embeddings_pkl.tar.bz2'
 embedding_path = str(Path.home()) + poly_path
@@ -42,7 +39,7 @@ model = TransformerModel(ntokens, emsize, nhead, nhid, nlayers, embeddings, drop
 # -------------
 #
 
-criterion = nn.CrossEntropyLoss(ignore_index=dm.PAD_IDX, reduction='mean')
+criterion = nn.CrossEntropyLoss(reduction='mean')
 lr = 0.05  # learning rate
 optimizer = torch.optim.SGD(model.parameters(), lr=lr)
 
@@ -96,9 +93,8 @@ def evaluate(eval_model, data_source):
 # Loop over epochs. Save the model if the validation loss is the best
 # we've seen so far.
 
-def train_multiple_epochs():
+def train_multiple_epochs(epochs):
     best_val_loss = evaluate(model, dev_d)
-    epochs = 20  # The number of epochs
     best_model = model
 
     # You may bail early using ctrl+c
@@ -111,6 +107,15 @@ def train_multiple_epochs():
             print('| end of epoch {:3d} | time: {:5.2f}s | valid loss {:5.2f} | '
                   'valid ppl {:8.2f}'.format(epoch, (time.time() - epoch_start_time),
                                              val_loss, math.exp(val_loss)))
+
+            batch = random.randint(0,len(test_d)-1)
+            y_true = test_d[batch][:,:3]
+            y_pred = model.predict(y_true)
+
+            for yt, yp in zip(*list(map(dm.to_sentence, [y_true, y_pred]))):
+                print(f'\tIN:  {yt}')
+                print(f'\tOUT: {yp}')
+
             print('-' * 89)
 
             if val_loss < best_val_loss:
@@ -123,9 +128,9 @@ def train_multiple_epochs():
     return best_model
 
 
-model.load_state_dict(torch.load("saved_models/20epochs_with_max_seq_len128.pt"))
-best_model = model
-# best_model = train_multiple_epochs()
+# model.load_state_dict(torch.load("saved_models/20epochs_with_max_seq_len128.pt"))
+# best_model = model
+best_model = train_multiple_epochs(200)
 
 ######################################################################
 # Evaluate the model with the test dataset

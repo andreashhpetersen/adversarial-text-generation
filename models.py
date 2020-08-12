@@ -24,23 +24,23 @@ class PositionalEncoding(nn.Module):
 
 
 class TransformerModel(nn.Module):
-    def __init__(self, ntoken, ninp, nhead, nhid, nlayers, embeddings=None, dropout=0.5):
+    def __init__(self, voc_sz, emb_sz, nhead, hid_sz, nlayers, embeddings=None, dropout=0.5):
         super(TransformerModel, self).__init__()
         from torch.nn import TransformerEncoder, TransformerEncoderLayer
         self.model_type = 'Transformer'
         self.src_mask = None
 
-        self.encoder = nn.Embedding(ntoken, ninp, padding_idx=0)
+        self.encoder = nn.Embedding(voc_sz, emb_sz, padding_idx=0)
         if embeddings is not None:
-            assert ntoken == embeddings.shape[0]
-            assert ninp == embeddings.shape[1]
+            assert voc_sz == embeddings.shape[0]
+            assert emb_sz == embeddings.shape[1]
             self.encoder.load_state_dict({'weight': embeddings})
 
-        self.pos_encoder = PositionalEncoding(ninp, dropout)
-        encoder_layers = TransformerEncoderLayer(ninp, nhead, nhid, dropout)
+        self.pos_encoder = PositionalEncoding(emb_sz, dropout)
+        encoder_layers = TransformerEncoderLayer(emb_sz, nhead, hid_sz, dropout)
         self.transformer_encoder = TransformerEncoder(encoder_layers, nlayers)
-        self.ninp = ninp
-        self.decoder = nn.Linear(ninp, ntoken)
+        self.emb_sz = emb_sz
+        self.decoder = nn.Linear(emb_sz, voc_sz)
 
         self.init_weights()
 
@@ -61,7 +61,7 @@ class TransformerModel(nn.Module):
             mask = self._generate_square_subsequent_mask(len(src)).to(device)
             self.src_mask = mask
 
-        src = self.encoder(src) * math.sqrt(self.ninp)
+        src = self.encoder(src) * math.sqrt(self.emb_sz)
         src = self.pos_encoder(src)
         encoded = self.transformer_encoder(src, self.src_mask)
         return encoded
@@ -76,29 +76,86 @@ class TransformerModel(nn.Module):
 
     def predict(self, inp):
         device = inp.device
-        remove_batch = False
-        if inp.dim() == 1:
-            inp = inp.view(-1, 1)
-            remove_batch = True
-
         out = self.forward(inp.to(device))
         probs = F.softmax(out, dim=2)
-        if remove_batch:
-            probs = probs.view(probs.shape[0], -1)
-        return torch.argmax(probs, dim=1)[inp.view(-1) != 0]
+        return torch.argmax(probs, dim=2)
+
+
+class EncoderRNN(nn.Module):
+    def __init__(self, voc_sz, hidden_size, embeddings=None):
+        super(EncoderRNN, self).__init__()
+        self.hidden_size = hidden_size
+
+        self.embedding = nn.Embedding(voc_sz, hidden_size, padding_idx=0)
+        if embeddings is not None:
+            assert voc_sz == embeddings.shape[0]
+            assert hidden_size == embeddings.shape[1]
+            self.embedding.load_state_dict({'weight': embeddings})
+
+        self.gru = nn.GRU(hidden_size, hidden_size)
+
+    def forward(self, input, hidden):
+        embedded = self.embedding(input).view(1, 1, -1)
+        output, hidden = self.gru(embedded, hidden)
+        return output, hidden
+
+    def init_hidden(self):
+        return torch.zeros(1, 1, self.hidden_size)
+
+
+class AttnDecoderRNN(nn.Module):
+    def __init__(self, hidden_size, voc_sz, embeddings=None, dropout_p=0.1, max_length=128):
+        super(AttnDecoderRNN, self).__init__()
+        self.hidden_size = hidden_size
+        self.voc_sz = voc_sz
+        self.dropout_p = dropout_p
+        self.max_length = max_length
+
+        self.embedding = nn.Embedding(self.voc_sz, self.hidden_size, padding_idx=0)
+        if embeddings is not None:
+            assert voc_sz == embeddings.shape[0]
+            assert hidden_size == embeddings.shape[1]
+            self.embedding.load_state_dict({'weight': embeddings})
+
+        self.attn = nn.Linear(self.hidden_size * 2, self.max_length)
+        self.attn_combine = nn.Linear(self.hidden_size * 2, self.hidden_size)
+        self.dropout = nn.Dropout(self.dropout_p)
+        self.gru = nn.GRU(self.hidden_size, self.hidden_size)
+        self.out = nn.Linear(self.hidden_size, self.voc_sz)
+
+    def forward(self, input, hidden, encoder_outputs):
+        embedded = self.embedding(input).view(1, 1, -1)
+        embedded = self.dropout(embedded)
+
+        attn_weights = F.softmax(
+            self.attn(torch.cat((embedded[0], hidden[0]), 1)), dim=1)
+        attn_applied = torch.bmm(attn_weights.unsqueeze(0),
+                                 encoder_outputs.unsqueeze(0))
+
+        output = torch.cat((embedded[0], attn_applied[0]), 1)
+        output = self.attn_combine(output).unsqueeze(0)
+
+        output = F.relu(output)
+        output, hidden = self.gru(output, hidden)
+
+        output = F.log_softmax(self.out(output[0]), dim=1)
+        return output, hidden, attn_weights
+
+    def init_hidden(self):
+        return torch.zeros(1, 1, self.hidden_size)
 
 
 class SimpleGenerator(nn.Module):
-    def __init__(self, embeddings, hidden_size=512):
+    def __init__(self, embeddings, hid_sz=512):
         super(SimpleGenerator, self).__init__()
 
         vocabulary_size = embeddings.size(0)
-        embedding_size = embeddings.size(1)
-        self.embedding = nn.Embedding(vocabulary_size, embedding_size, padding_idx=0)
+        emb_sz = embeddings.size(1)
+        self.embedding = nn.Embedding(vocabulary_size, emb_sz, padding_idx=0)
         self.embedding.load_state_dict({'weight': embeddings})
 
-        self.layer1 = nn.Linear(embedding_size, hidden_size)
-        self.layer2 = nn.Linear(hidden_size, embedding_size)
+        self.layer1 = nn.Linear(emb_sz, hid_sz)
+        self.layer2 = nn.Linear(hid_sz, emb_sz)
 
     def forward(self, x):
         x = self.embedding(x)
@@ -109,24 +166,20 @@ class SimpleGenerator(nn.Module):
 
         return x
 
+
 class EncoderGenerator(nn.Module):
-    def __init__(self, ntoken, ninp, nhead, nhid, nlayers, embeddings=None, dropout=0.5):
+    def __init__(self, voc_sz, emb_sz, nhead, hid_sz, nlayers, dropout=0.5):
         super(EncoderGenerator, self).__init__()
         from torch.nn import TransformerEncoder, TransformerEncoderLayer
         self.model_type = 'Transformer'
         self.src_mask = None
 
-        self.encoder = nn.Embedding(ntoken, ninp, padding_idx=0)
-        if embeddings is not None:
-            assert ntoken == embeddings.shape[0]
-            assert ninp == embeddings.shape[1]
-            self.encoder.load_state_dict({'weight': embeddings})
-
-        self.pos_encoder = PositionalEncoding(ninp, dropout)
-        encoder_layers = TransformerEncoderLayer(ninp, nhead, nhid, dropout)
+        self.linear1 = nn.Linear(emb_sz, 128)
+        self.pos_encoder = PositionalEncoding(128, dropout)
+        encoder_layers = TransformerEncoderLayer(128, nhead, hid_sz, dropout)
         self.transformer_encoder = TransformerEncoder(encoder_layers, nlayers)
-        self.ninp = ninp
-        self.decoder = nn.Linear(ninp, ninp)
+        self.emb_sz = emb_sz
+        self.decoder = nn.Linear(128, emb_sz)
 
         self.init_weights()
 
@@ -137,7 +190,6 @@ class EncoderGenerator(nn.Module):
 
     def init_weights(self):
         initrange = 0.1
-        self.encoder.weight.data.uniform_(-initrange, initrange)
         self.decoder.bias.data.zero_()
         self.decoder.weight.data.uniform_(-initrange, initrange)
 
@@ -147,7 +199,7 @@ class EncoderGenerator(nn.Module):
             mask = self._generate_square_subsequent_mask(len(src)).to(device)
             self.src_mask = mask
 
-        src = self.encoder(src) * math.sqrt(self.ninp)
+        src = self.linear1(src)
         src = self.pos_encoder(src)
         encoded = self.transformer_encoder(src, self.src_mask)
         return encoded
@@ -162,15 +214,17 @@ class EncoderGenerator(nn.Module):
 
 
 class EncoderDiscriminator(nn.Module):
-    def __init__(self, embedding_size, sentence_size, head_count, hidden_size, layer_count, dropout=0.5):
+    def __init__(self, emb_sz, seq_sz, nhead, hid_sz, layer_count, dropout=0.5):
         super(EncoderDiscriminator, self).__init__()
         self.src_mask = None
 
-        self.pos_encoder = PositionalEncoding(embedding_size, dropout)
-        encoder_layers = nn.TransformerEncoderLayer(embedding_size, head_count, hidden_size, dropout)
+        self.pos_encoder = PositionalEncoding(emb_sz, dropout)
+        encoder_layers = nn.TransformerEncoderLayer(
+            emb_sz, nhead, hid_sz, dropout
+        )
         self.transformer_encoder = nn.TransformerEncoder(encoder_layers, layer_count)
-        self.embedding_size = embedding_size
-        self.decoder = nn.Linear(embedding_size * sentence_size, 1)
+        self.emb_sz = emb_sz
+        self.decoder = nn.Linear(emb_sz * seq_sz, 1)
 
         self.init_weights()
 
@@ -187,42 +241,41 @@ class EncoderDiscriminator(nn.Module):
 
     def forward(self, x):
         batch_size = x.size(1)
-        sentence_size = x.size(0)
-        embedding_size = x.size(2)
+        seq_sz = x.size(0)
+        emb_sz = x.size(2)
 
         if self.src_mask is None or self.src_mask.size(0) != len(x):
             device = x.device
             mask = self._generate_square_subsequent_mask(len(x)).to(device)
             self.src_mask = mask
 
-        # x = self.encoder(x) * math.sqrt(self.embedding_size)
         x = self.pos_encoder(x)
         x = self.transformer_encoder(x, self.src_mask)
 
         x = x.permute(1, 0, 2)  # (batch, sentence, embedding)
-        x = x.reshape(-1, sentence_size * embedding_size)  # (batch, sentence * embedding)
+        x = x.reshape(-1, seq_sz * emb_sz)  # (batch, sentence * embedding)
         x = self.decoder(x)
-        x = F.sigmoid(x).view(-1)
+        x = torch.sigmoid(x).view(-1)
 
         return x
 
 
 class SimpleDiscriminator(nn.Module):
-    def __init__(self, embedding_size, sentence_size, hidden_size=1024):
+    def __init__(self, emb_sz, seq_sz, hid_sz=1024):
         super(SimpleDiscriminator, self).__init__()
 
-        self.layer1 = nn.Linear(embedding_size * sentence_size, hidden_size)
-        self.layer2 = nn.Linear(hidden_size, hidden_size)
-        self.layer3 = nn.Linear(hidden_size, 1)
+        self.layer1 = nn.Linear(emb_sz * seq_sz, hid_sz)
+        self.layer2 = nn.Linear(hid_sz, hid_sz)
+        self.layer3 = nn.Linear(hid_sz, 1)
         # doesn't work
 
     def forward(self, x):
         batch_size = x.size(1)
-        sentence_size = x.size(0)
-        embedding_size = x.size(2)
+        seq_sz = x.size(0)
+        emb_sz = x.size(2)
 
         x = x.permute(1, 0, 2)  # (batch, sentence, embedding)
-        x = x.reshape(-1, sentence_size * embedding_size)  # (batch, sentence * embedding)
+        x = x.reshape(-1, seq_sz * emb_sz)  # (batch, sentence * embedding)
         x = F.leaky_relu(x)  # TODO: is this activation necessary?
         x = self.layer1(x)
         x = F.leaky_relu(x)
@@ -263,10 +316,10 @@ class Generator(nn.Module):
 
 
 class Discriminator(nn.Module):
-    def __init__(self, ntokens, max_seq_len=128, hid_sz=64):
+    def __init__(self, voc_szs, max_seq_len=128, hid_sz=64):
         super(Discriminator, self).__init__()
 
-        self.layer_1 = nn.Linear(ntokens, hid_sz)
+        self.layer_1 = nn.Linear(voc_szs, hid_sz)
         self.layer_2 = nn.Linear(max_seq_len * hid_sz, hid_sz)
         self.layer_out = nn.Linear(hid_sz, 1)
 
