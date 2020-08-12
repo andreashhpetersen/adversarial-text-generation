@@ -134,13 +134,12 @@ def evaluate(encoder, decoder, sentence, max_length=MAX_LENGTH):
 
         encoder_outputs = torch.zeros(max_length, encoder.hidden_size, device=device)
 
-        import ipdb; ipdb.set_trace()
         for ei in range(input_length):
             encoder_output, encoder_hidden = encoder(input_tensor[ei],
                                                      encoder_hidden)
             encoder_outputs[ei] += encoder_output[0, 0]
 
-        decoder_input = torch.tensor([[SOS_token]])  # SOS
+        decoder_input = torch.tensor([[dm.SOS_IDX]])  # SOS
 
         decoder_hidden = encoder_hidden
 
@@ -152,11 +151,11 @@ def evaluate(encoder, decoder, sentence, max_length=MAX_LENGTH):
                 decoder_input, decoder_hidden, encoder_outputs)
             decoder_attentions[di] = decoder_attention.data
             topv, topi = decoder_output.data.topk(1)
-            if topi.item() == EOS_token:
+            if topi.item() == dm.EOS_IDX:
                 decoded_words.append('<EOS>')
                 break
             else:
-                decoded_words.append(output_lang.index2word[topi.item()])
+                decoded_words.append(dm.idx2word[topi.item()])
 
             decoder_input = topi.squeeze().detach()
 
@@ -165,7 +164,8 @@ def evaluate(encoder, decoder, sentence, max_length=MAX_LENGTH):
 
 def evaluateRandomly(encoder, decoder, n=10):
     for i in range(n):
-        ex = random.choice(dm.test_data)
+        ex = random.choice(test_d)
+        ex = dm.to_sentence(ex, as_list=True)[0]
         pair = (ex, ex)
         print('>', pair[0])
         print('=', pair[1])
