@@ -11,6 +11,8 @@
 
 \usepackage{parskip}
 
+\usepackage{url}
+
 \usepackage[
     style=authoryear-icomp,
     maxbibnames=9,
@@ -34,6 +36,7 @@
 
 % argmax
 \DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\softmax}{soft\,max}
 
 \graphicspath{{images/}}
 
@@ -171,7 +174,7 @@ function. This is the approach taken by~\cite{kusner2016gans}. Here, a
 $d$-dimensional one-hot encoding vector $\bm{y}$ is approximated using
 
 \begin{equation}
-    \bm{y} = softmax(\frac{1}{\tau}(\bm{h}+\bm{g}))
+    \bm{y} = \softmax(\frac{1}{\tau}(\bm{h}+\bm{g}))
 \end{equation}
 
 where $\bm{h}$ is some hidden state (ie.\ of an RNN), $\bm{g}$ is drawn from a
@@ -189,16 +192,72 @@ distribution $\bm{p} = softmax(\bm{h})$ where $p_i = p(y_i=1), i = 1\dots d$.
 Finally, for other examples on the third approach,
 see~\cite{donahue2018adversarial} and~\cite{haidar2019textkdgan}.
 
+
 \section{Method}\label{sec:method}
 
+For all our models (autoencoders and GANs), we drew inspiration PyTorch
+tutorials
+(\cite{pytorchTutorialAtt},~\cite{pytorchTutorialTransformer},~\cite{pytorchTutorialGAN}),
+tweaking them to our specific needs. The whole process (project development,
+research, data collection, coding, training, experimentation and analysis) was
+conducted during a 10-day period.
 
-\subsection{Baseline}
-
+This section will describe this process, focusing on the final outcomes rather
+than including all our intermediate steps and missteps.
 
 \subsection{Dataset}\label{sec:dataset}
 
+For training of the autoencoders, we simply needed dataset consisting of a large
+number of English sentences. We obtained this from Universal Dependencies, where
+used the `Universal Dependencies --- English Dependency Treebank Universal
+Dependencies English Web Treebank v2.6 --- 2020--05--15' (\cite{silveira14gold})
+consisting of 12,543 training sentences, 2,077 test sentences, 2,002 dev
+sentences and a vocabulary of 16,654 training tokens. The data is annotated with
+metadata such as lemmas and word classes, but we discarded this information as
+it was not relevant for our purpose.
+
+Furthermore, we also utilized another dataset intended for training
+English-to-French translation. This dataset originates from
+\url{https://tatoeba.org/eng/} and consists of 135,842 sentence pairs. We
+discarded the French sentences and removed all duplicate sentences and sentences
+of length smaller than 3, as well as splitting all sentences that contained
+punctuations, questionmarks, exclamation points, etc. This gave us a set of
+92,343 sentences, which we split 80/20 between training and testing/development,
+and a vocabulary of 13,731 tokens.
+
 
 \subsection{Models}\label{sec:models}
+
+We developed two different versions of the autoencoder model and also two
+different GANs. These will be described in this subsection.
+
+\subsubsection{The TransformerModel}\label{sec:transformermodel}
+
+Our first autoencoder was based on~\cite{pytorchTutorialTransformer}. This model
+consists of a very simple decoder, that is simply a feed-forward neural net that
+takes a 2-dimensional tensor $X \in \mathbb{R}^{n \times k}$ and maps each of
+the $n$ $k$-dimensional vectors of the sequence to a probability distribution
+over the entire vocabulary which it then can convert to an output sequence using
+$argmax$.
+
+The encoder, however, is responsible for generating $X$ and it does so by using
+the Transformer architecture as suggested in~\cite{vaswani2017attention} and
+implemented in the PyTorch module \texttt{nn.Transformer}. For our purpose,
+however, we only used the submodule \texttt{nn.TransformerEncoder}, which
+consists of a stack of encoder layers that uses self-attention to focus on
+specific, relevant parts of the input sequence in one go, and then passes its
+output on to the next layer through a feed-forward network. As a preprocessing
+step, before the input sequence is passed through the transformer, positional
+encoding is added, as suggested in the paper (\cite{vaswani2017attention}).
+
+
+\subsubsection{RNN and Attention based Autoencoder}\label{sec:attnRNN}
+
+
+\subsubsection{Simple GAN}\label{sec:simpleGAN}
+
+
+\subsubsection{Transformer GAN}\label{sec:simpleGAN}
 
 
 \subsection{Training}\label{sec:training}
