@@ -178,6 +178,7 @@ def run(padding_eos):
                 plt.legend(['validation', 'training'], loc='upper right')
                 plt.savefig(f'plots/transformer{plot_name}.svg')
                 plt.savefig(f'plots/transformer{plot_name}.png')
+                plt.close()
                 with open(stats_path, "w") as file:
                     file.write(json.dumps(stats))
         except KeyboardInterrupt:
@@ -192,6 +193,7 @@ def run(padding_eos):
         plt.legend(['validation', 'training'], loc='upper right')
         plt.savefig(f'plots/transformer{plot_name}.svg')
         plt.savefig(f'plots/transformer{plot_name}.png')
+        plt.close()
 
         stats['test_loss'] = evaluate(model, test_d)
         stats['test_acc'] = accuracy(model, test_d)
