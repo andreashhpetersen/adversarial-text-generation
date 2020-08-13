@@ -107,88 +107,95 @@ print("Starting Training Loop...")
 num_epochs = 10
 source_model.eval()
 source_model.requires_grad_(False)
-for epoch in range(num_epochs):
-    G.train()
-    D.train()
-    total_loss = 0.
-    start_time = time.time()
-    batch_idxs = list(range(0, len(train_d)))
-    shuffle(batch_idxs)
-    for i, batch_idx in enumerate(batch_idxs):
-        batch = train_d[batch_idx].to(device)
-        batch_sz = batch.shape[1]
+try:
+    for epoch in range(num_epochs):
+        G.train()
+        D.train()
+        total_loss = 0.
+        start_time = time.time()
+        batch_idxs = list(range(0, len(train_d)))
+        shuffle(batch_idxs)
+        for i, batch_idx in enumerate(batch_idxs):
+            batch = train_d[batch_idx].to(device)
+            batch_sz = batch.shape[1]
 
-        ############################
-        # (1) Update D network: maximize log(D(x)) + log(1 - D(G(z)))
-        ###########################
-        ## Train with all-real batch
-        D.zero_grad()
-        encoded_batch = source_model.encode(batch)
-        label = torch.full((batch_sz,), real_label, device=device)
-        output_real = D(encoded_batch)
-        errD_real = criterion(output_real, label)
-        errD_real.backward()
+            ############################
+            # (1) Update D network: maximize log(D(x)) + log(1 - D(G(z)))
+            ###########################
+            ## Train with all-real batch
+            D.zero_grad()
+            encoded_batch = source_model.encode(batch)
+            label = torch.full((batch_sz,), real_label, device=device)
+            output_real = D(encoded_batch)
+            errD_real = criterion(output_real, label)
+            errD_real.backward()
 
 
-        ## Train with all-fake batch from encoder
-        encoded_fakes = source_model.encode(random_words(batch))
-        label.fill_(fake_label)
-        output_fake = D(encoded_fakes)
-        errD_fake_encoded = criterion(output_fake, label)
-        errD_fake_encoded.backward()
+            ## Train with all-fake batch from encoder
+            encoded_fakes = source_model.encode(random_words(batch))
+            label.fill_(fake_label)
+            output_fake = D(encoded_fakes)
+            errD_fake_encoded = criterion(output_fake, label)
+            errD_fake_encoded.backward()
 
-        D_x = torch.cat([output_real, output_fake]).mean().item()
+            D_x = torch.cat([output_real, output_fake]).mean().item()
 
-        ## Train with all-fake batch
-        label.fill_(fake_label)
-        noise = torch.randn((dm.max_seq_len, batch_sz, emsize), device=device)
-        fake = G(noise)
-        output = D(fake.detach()).view(-1)
-        errD_fake = criterion(output, label)
-        errD_fake.backward()
-        errD = errD_real + errD_fake
+            ## Train with all-fake batch
+            label.fill_(fake_label)
+            noise = torch.randn((dm.max_seq_len, batch_sz, emsize), device=device)
+            fake = G(noise)
+            output = D(fake.detach()).view(-1)
+            errD_fake = criterion(output, label)
+            errD_fake.backward()
+            errD = errD_real + errD_fake
 
-        D_G_z1 = output.mean().item()
+            D_G_z1 = output.mean().item()
 
-        # Update D
-        optimizerD.step()
+            # Update D
+            optimizerD.step()
 
-        ############################
-        # (2) Update G network: maximize log(D(G(z)))
-        ###########################
-        G.zero_grad()
+            ############################
+            # (2) Update G network: maximize log(D(G(z)))
+            ###########################
+            G.zero_grad()
 
-        label.fill_(real_label)
-        output = D(fake).view(-1)
-        errG = criterion(output, label)
-        errG.backward()
-        D_G_z2 = output.mean().item()
+            label.fill_(real_label)
+            output = D(fake).view(-1)
+            errG = criterion(output, label)
+            errG.backward()
+            D_G_z2 = output.mean().item()
 
-        # Update G
-        optimizerG.step()
+            # Update G
+            optimizerG.step()
 
-        # Output training stats
-        if i % 50 == 0:
-            print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f'
-                  % (epoch, num_epochs, i, len(batch_idxs),
-                     errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
+            # Output training stats
+            if i % 50 == 0:
+                print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f'
+                      % (epoch, num_epochs, i, len(batch_idxs),
+                         errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
 
-        # Save Losses for plotting later
-        G_losses.append(errG.item())
-        D_losses.append(errD.item())
+            # Save Losses for plotting later
+            G_losses.append(errG.item())
+            D_losses.append(errD.item())
 
-        # Check how the generator is doing by saving G's output on fixed_noise
-        if (iters % 500 == 0) or ((epoch == num_epochs - 1) and (i == len(batch_idxs) - 1)):
-            with torch.no_grad():
-                G.eval()
-                fake = G(fixed_noise).detach()
-                decoded = source_model.decode(fake)
-                probs = F.softmax(decoded, dim=2).view(dm.max_seq_len, voc_sz)
-                print(dm.to_sentence(torch.argmax(probs, dim=1)))
+            # Check how the generator is doing by saving G's output on fixed_noise
+            if (iters % 500 == 0) or ((epoch == num_epochs - 1) and (i == len(batch_idxs) - 1)):
+                with torch.no_grad():
+                    G.eval()
+                    fake = G(fixed_noise).detach()
+                    decoded = source_model.decode(fake)
+                    probs = F.softmax(decoded, dim=2).view(dm.max_seq_len, voc_sz)
+                    print(dm.to_sentence(torch.argmax(probs, dim=1)))
 
-        iters += 1
+            iters += 1
+except KeyboardInterrupt:
+    print('-' * 89)
+    print('Exiting from training early')
 
-with open("saved_models/generator.stats.json", "w") as file:
+torch.save(G.state_dict(), "saved_models/gan_generator.pt")
+torch.save(D.state_dict(), "saved_models/gan_discriminator.pt")
+
+with open("saved_models/gan.stats.json", "w") as file:
     json.dumps({"G_losses": G_losses, "D_losses": D_losses})
 
 plt.figure(figsize=(10, 5))
