@@ -1,15 +1,17 @@
+import json
 import time
 import math
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from random import shuffle
+import random
 import matplotlib.pyplot as plt
 from IPython.core.debugger import set_trace
 import torch.nn.functional as F
 
 from models import TransformerModel, SimpleGenerator, SimpleDiscriminator, EncoderDiscriminator, EncoderGenerator
-from reader import DataManager
+from reader_sentences import DataManager
 
 from polyglot.mapping import Embedding, CaseExpander
 from pathlib import Path
@@ -41,14 +43,13 @@ NHID = 200  # the dimension of the feedforward network model in nn.TransformerEn
 NLAYERS = 4  # the number of nn.TransformerEncoderLayer in nn.TransformerEncoder
 NHEAD = 4  # the number of heads in the multiheadattention models
 DROPOUT = 0.2  # the DROPOUT value
-
 def load_source_model(device):
     model = TransformerModel(
         voc_sz, emsize, NHEAD, NHID, NLAYERS, embeddings, DROPOUT
     ).to(device)
     model.load_state_dict(
         torch.load(
-            "saved_models/20epochs_with_padding_and_eos.pt",
+            "saved_models/transformer.pt",
             map_location=device
         )
     )
@@ -104,8 +105,9 @@ iters = 0
 
 print("Starting Training Loop...")
 num_epochs = 10
+source_model.eval()
+source_model.requires_grad_(False)
 for epoch in range(num_epochs):
-
     G.train()
     D.train()
     total_loss = 0.
@@ -139,7 +141,7 @@ for epoch in range(num_epochs):
 
         ## Train with all-fake batch
         label.fill_(fake_label)
-        noise = torch.randn((dm.max_seq_len, batch_sz, emsize))
+        noise = torch.randn((dm.max_seq_len, batch_sz, emsize), device=device)
         fake = G(noise)
         output = D(fake.detach()).view(-1)
         errD_fake = criterion(output, label)
@@ -185,6 +187,9 @@ for epoch in range(num_epochs):
                 print(dm.to_sentence(torch.argmax(probs, dim=1)))
 
         iters += 1
+
+with open("saved_models/generator.stats.json", "w") as file:
+    json.dumps({"G_losses": G_losses, "D_losses": D_losses})
 
 plt.figure(figsize=(10, 5))
 plt.title("Generator and Discriminator Loss During Training")
