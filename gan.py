@@ -81,7 +81,7 @@ def run(padding_eos):
         ).to(device)
         return source_model, generator, discriminator
 
-    def ready_training(voc_sz, emsize, max_seq_len, embeddings, device, lr=0.0002, beta1=0.5):
+    def ready_training(voc_sz, emsize, max_seq_len, embeddings, device, lr=0.0001, beta1=0.5):
         source_model, G, D = prepare_models(voc_sz, emsize, embeddings, device)
         noise = torch.randn((max_seq_len, 1, emsize)).to(device)
         optD = optim.Adam(D.parameters(), lr=lr, betas=(beta1, 0.999))
