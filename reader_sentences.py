@@ -1,15 +1,19 @@
+import os
 import random
+from collections import OrderedDict
 
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 
+
 class DataManager:
     SOS_TOK, EOS_TOK, UNK_TOK = '<SOS>', '<EOS>', '<unk>'
     PAD_TOK, PAD_IDX = '<PAD>', 0
 
-    def __init__(self, root_dir='./data/', lang='en', min_seq_len=3, max_seq_len=128, one_size=False, normalize_to_max_seq_len_and_eos=True, eos=None):
+    def __init__(self, root_dir='./data/', lang='en', min_seq_len=3, max_seq_len=128, one_size=False,
+                 normalize_to_max_seq_len_and_eos=True, eos=None):
         if eos is None:
             eos = normalize_to_max_seq_len_and_eos
         self.eos = eos
@@ -18,12 +22,12 @@ class DataManager:
 
         self.normalize_to_max_seq_len_and_eos = normalize_to_max_seq_len_and_eos
 
-        # split 80:10:10
         self.all_data, self.vocab = self.get_sentences(self.path)
-        self.train_data = self.all_data[int(len(self.all_data)/5):]
+        # split 80:10:10
+        self.train_data = self.all_data[int(len(self.all_data) / 5):]
         dev_test_data = self.all_data[:int(len(self.all_data) / 5)]
-        self.test_data = dev_test_data[int(len(dev_test_data)/2):]
-        self.dev_data = dev_test_data[:int(len(dev_test_data)/2)]
+        self.test_data = dev_test_data[int(len(dev_test_data) / 2):]
+        self.dev_data = dev_test_data[:int(len(dev_test_data) / 2)]
 
         print(f"len(train) = {len(self.train_data)}")
         print(f"len(test) = {len(self.test_data)}")
@@ -42,7 +46,7 @@ class DataManager:
 
     def get_sentences(self, filename):
         sentences = []
-        words, all_words = [], { self.UNK_TOK, self.EOS_TOK, self.SOS_TOK }
+        words, all_words = [], [self.UNK_TOK, self.EOS_TOK, self.SOS_TOK]
         with open(filename, 'r') as f:
             lines = f.readlines()
 
@@ -53,9 +57,15 @@ class DataManager:
                 words += [self.EOS_TOK]
             sentences.append(words)
             for word in words:
-                all_words.add(word)
+                all_words.append(word)
 
-        return sentences, all_words
+        return sentences, self.unique(all_words)
+
+    @staticmethod
+    def unique(list):
+        seen = set()
+        seen_add = seen.add
+        return [x for x in list if not (x in seen or seen_add(x))]
 
     def make_idx_mappings(self, elements):
         """
@@ -76,7 +86,7 @@ class DataManager:
         if type(idxs) == torch.Tensor:
             if len(idxs.shape) > 1:
                 return [
-                    self.to_sentence(idxs[:,i], as_list=as_list)
+                    self.to_sentence(idxs[:, i], as_list=as_list)
                     for i in range(idxs.shape[1])
                 ]
             idxs = idxs.tolist()
@@ -130,7 +140,7 @@ class DataManager:
         for i in range(0, len(X), batch_sz):
 
             # get the data points
-            batch = X[i:i+batch_sz]
+            batch = X[i:i + batch_sz]
 
             # discard last data points if they are fewer than batch_sz
             if len(batch) < batch_sz:
@@ -184,3 +194,8 @@ class DataManager:
         y_true = self.to_sentence(y_true, as_list=True)
         y_pred = self.to_sentence(y_pred, as_list=True)
         return [(yt, yp, yt == yp) for yt, yp in zip(y_true, y_pred)]
+
+
+if __name__ == '__main__':
+    dm = DataManager()
+    print(dm.to_idxs("hello my darling , hello my rag time gal"))
