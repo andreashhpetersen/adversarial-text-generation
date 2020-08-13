@@ -204,7 +204,8 @@ def run(padding_eos):
         return best_model
 
     def human_eval(i):
-        ex = test_d[i][:, 1].to(device)
+        model.eval()
+        ex = test_d[i][:, 1].view(-1, 1).to(device)
         print("Actual:")
         print(' '.join(dm.idx2word[w.item()] for w in ex[ex != 0]))
         y_pred = model.predict(ex)
@@ -216,6 +217,8 @@ def run(padding_eos):
 
     if os.path.isfile(path):
         model.load_state_dict(torch.load(path))
+        # model = train_multiple_epochs(100, '_padding-eos' if padding_eos else '')
+        # torch.save(model.state_dict(), path)
     else:
         model = train_multiple_epochs(100, '_padding-eos' if padding_eos else '')
         torch.save(model.state_dict(), path)
@@ -231,10 +234,17 @@ def run(padding_eos):
     # Apply the best model to check the result with the test dataset.
 
     test_loss = evaluate(model, test_d)
+    test_acc = accuracy(model, test_d)
     print('=' * 89)
     # print('| End of training | test loss {:5.2f} | test ppl {:8.2f}'.format(
     #     test_loss, math.exp(test_loss)))
     print('| End of training | test loss {:5.2f}'.format(test_loss))
+    print('| End of training | test accuray {:5.2f}'.format(test_acc))
     print('=' * 89)
+
+    for i in range(10):
+        human_eval(i)
+
+    # print(model.state_dict())
 
     return model
