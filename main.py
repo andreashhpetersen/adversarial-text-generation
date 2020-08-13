@@ -87,17 +87,29 @@ def run(padding_eos):
 
 
     def accuracy(eval_model, data_source):
-        return "TODO"
-        # eval_model.eval()  # Turn on the evaluation mode
-        # total_loss = 0.
-        # with torch.no_grad():
-        #     for i, batch in enumerate(data_source):
-        #         data = batch.to(device)
-        #         targets = batch.reshape(-1).to(device)
-        #         output = eval_model(data)
-        #         output_flat = output.view(-1, ntokens)
-        #         total_loss += len(data) * criterion(output_flat, targets).item()
-        # return total_loss / (len(data_source) - 1)
+        eval_model.eval()  # Turn on the evaluation mode
+        total_words = 0
+        correct_words = 0
+        with torch.no_grad():
+            for i, batch in enumerate(data_source):
+                batch = batch.to(device)
+                y_pred = eval_model.predict(batch)
+
+                batch.permute(1, 0)
+                y_pred.permute(1, 0)
+
+                for sentence, pred_sentence in zip(batch, y_pred):
+                    for word, predicted in zip(sentence, pred_sentence):
+                        word = word.item()
+                        predicted = predicted.item()
+                        total_words += 1
+                        if padding_eos:
+                            if word == predicted:
+                                correct_words += 1
+                        else:
+                            if word == predicted and predicted != dm.PAD_IDX:
+                                correct_words += 1
+        return correct_words / total_words
 
     def evaluate(eval_model, data_source):
         eval_model.eval()  # Turn on the evaluation mode
@@ -204,7 +216,7 @@ def run(padding_eos):
     if os.path.isfile(path):
         model.load_state_dict(torch.load(path))
     else:
-        model = train_multiple_epochs(200, 'padding-eos' if padding_eos else '')
+        model = train_multiple_epochs(200, '_padding-eos' if padding_eos else '')
         torch.save(model.state_dict(), path)
 
     # model.load_state_dict(torch.load("saved_models/20epochs_with_max_seq_len128.pt"))
