@@ -250,6 +250,11 @@ output on to the next layer through a feed-forward network. As a preprocessing
 step, before the input sequence is passed through the transformer, positional
 encoding is added, as suggested in the paper (\cite{vaswani2017attention}).
 
+This model also uses an embedding as its first layer. For embeddings, we use
+pretrained word vectors from the \texttt{polyglot} Python package. These have an
+embedding size of 64, which therefore what we use across all models. Note that
+the next, RNN-based autoencoder uses the same embedding setup.
+
 
 \subsubsection{RNN and Attention based Autoencoder}\label{sec:attnRNN}
 
@@ -310,6 +315,35 @@ encoder. Thus, it is effectively a binary classifier, and its output should
 describe its conviction that the input is `true'.
 
 \subsection{Training}\label{sec:training}
+
+Our training had to aspects: first, we had to train our autoencoders on
+English-to-English sentence pairs, and then we had to train our GAN model. This
+section will describe both.
+
+\subsubsection{Training the autoencoders}
+
+This part is pretty straight forward. We give the model a batch of sentences
+which it then encodes and decodes again. Since the input sentence is also the
+target sentence, the loss is simply the difference between the input and the
+output. To calculate this loss, we use PyTorchs `nn.CrossEntropyLoss' which
+takes the raw output of the model (ie.\ before it has been converted to a
+probability distribution) and a target vector and then calculates the negative
+log-likelihood loss. We use Stochastic Gradient Descent to update the weights of
+the models.
+
+There were some notable differences between the way we trained the
+TransformerModel and the RNN-based model. For the TransformerModel we had good
+results with a learning rate of 0.05, and we performed training on the entire
+training set in batches of 8 and over the course of 25 epochs. We also trained
+it another time with just 10 epochs, but this time without ignoring the padding
+in the batches (when batching the data, not all sentences have the same length
+and the smaller sentences are padded with the special \texttt{<PAD>}-token).
+This makes the model achieve a lower loss much faster, as it quickly learns the
+pattern of the padding tokens, but this often comes at the expense of the model
+learning the actual sentence, which generally is what is of interest. However,
+we wanted our Student model to learn both from a Teacher that had learned
+padding and one that hadn't, so trained the autoencoders (Teacher) on both.
+
 
 
 \section{Analysis}\label{sec:analysis}
