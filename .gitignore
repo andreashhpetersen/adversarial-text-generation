@@ -7,3 +7,4 @@
 *.bcf
 *.blg
 *.run.xml
+__pycache__
