@@ -9,7 +9,10 @@ class DataManager:
     SOS_TOK, EOS_TOK, UNK_TOK = '<SOS>', '<EOS>', '<unk>'
     PAD_TOK, PAD_IDX = '<PAD>', 0
 
-    def __init__(self, root_dir='./data/', lang='en', min_seq_len=3, max_seq_len=128, one_size=False, normalize_to_max_seq_len_and_eos=True):
+    def __init__(self, root_dir='./data/', lang='en', min_seq_len=3, max_seq_len=128, one_size=False, normalize_to_max_seq_len_and_eos=True, eos=None):
+        if eos is None:
+            eos = normalize_to_max_seq_len_and_eos
+        self.eos = eos
         data_dir = f'{root_dir}{lang}'
         self.path = f'{data_dir}/sentences.txt'
 
@@ -42,7 +45,7 @@ class DataManager:
         for line in lines:
             line = line.strip('\n')
             words = line.split(' ')
-            if self.normalize_to_max_seq_len_and_eos:
+            if self.eos:
                 words += [self.EOS_TOK]
             sentences.append(words)
             for word in words:

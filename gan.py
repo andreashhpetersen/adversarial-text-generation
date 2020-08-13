@@ -18,7 +18,7 @@ from pathlib import Path
 
 
 def run(padding_eos):
-    dm = DataManager(max_seq_len=15, normalize_to_max_seq_len_and_eos=padding_eos)
+    dm = DataManager(max_seq_len=15, normalize_to_max_seq_len_and_eos=True, eos=padding_eos)
     batch_size = 4
     train_d, test_d, dev_d = dm.get_batched_data(batch_sz=batch_size)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
