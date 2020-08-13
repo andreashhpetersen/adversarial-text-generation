@@ -1,8 +1,8 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
-\usepackage{amsmath,amssymb}
+\usepackage{amsmath,amssymb,bm}
 \usepackage{mathtools}
-\usepackage{graphicx}
+\usepackage{graphicx,caption}
 \usepackage{listings}
 \usepackage[margin=1.2in]{geometry}
 
@@ -29,6 +29,12 @@
 % Math functions
 \DeclareMathOperator{\Span}{span}
 
+% Conditional
+\newcommand\given[1][]{\:#1\vert\:}
+
+% argmax
+\DeclareMathOperator*{\argmax}{arg\,max}
+
 \graphicspath{{images/}}
 
 \title{%
@@ -51,7 +57,7 @@
     \lipsum[1]
 \end{abstract}
 
-\section{Introduction}
+\section{Introduction}\label{sec:introduction}
 
 In recent years, Generative Adversarial Networks (GANs) have gained a lot of
 traction in the Deep Learning community because of their impressive results in
@@ -111,7 +117,77 @@ on our project.
 
 \section{Background}\label{sec:background}
 
-\lipsum[4]
+Applications GANs have mainly focused on image generation and has not yet seen a
+major breakthrough in text generation. As mentioned in
+Section~\ref{sec:introduction}, this is because the discrete nature of text,
+which is basically a sequence of words, requires a non-differentiable $argmax$
+function to transform a probability distribution over a vocabulary to a single
+value (ie.\ the word with the highest probability). This is depicted in
+Figure~\ref{fig:argmaxGAN}.
+
+\begin{figure}[h]
+    \centering
+    \captionsetup{width=0.8\textwidth}
+    \includegraphics[width=0.8\textwidth]{argmaxGAN.png}
+    \caption{%
+        A simple GAN model where the generator output is run through an
+        $argmax$ function before being given to the discriminator. This prevents
+        gradients to flow from the discriminator to the generator.
+        Source:~\cite{haidar2019textkdgan}.
+    }\label{fig:argmaxGAN}
+\end{figure}
+
+There have been, however, multiple attempts at working around this issue.
+According to~\cite{Chintapalli2019} these approaches can broadly be categorized
+into three types:
+
+\begin{itemize}
+    \item Reinforcement Learning-based solutions
+    \item The Gumbel-Softmax approximations
+    \item Avoiding discrete spaces by working with the continuous output of the
+        generaor
+\end{itemize}
+
+In this project, we follow the third approach, but in this section we will give
+short introductions to the idea behind the two first.
+
+As an example of an RL-based solution,~\cite{yu2016seqgan} proposes the SeqGAN
+model, in which the generator is considered an RL-agent with states
+$\mathbf{s}_t$ being the text generated at timestep $t$ and actions $\mathbf{a}$
+being all the possible words to choose next. The agent then chooses its next
+word (takes an action $a$) based on some policy function $\bm{\pi}(a \given
+\bm{s}_t, \bm{\theta})$, where $\bm{\theta}$ are the parameters to be
+optimized. Using Monte-Carlo rollouts to produce a number of different
+sentences sharing a prefix $\bm{s}_t$, the discriminator then rewards each
+sentence and the averaged reward is then used to perform gradient ascent on
+$\bm{J}(\bm{\theta})$, where $\bm{J}$ is the performance measure of
+$\bm{\theta}$. This approach alleviates some of the problems of training a GAN
+for text generation, but it suffers from an unstable and slow training process,
+convergence to sub-optimal local minima and and extremely large state-space.\
+
+Another approach is to use the Gumbel-Softmax distribution to approximate a
+one-hot encoding of a probability distribution passed through the $argmax$
+function. This is the approach taken by~\cite{kusner2016gans}. Here, a
+$d$-dimensional one-hot encoding vector $\bm{y}$ is approximated using
+
+\begin{equation}
+    \bm{y} = softmax(\frac{1}{\tau}(\bm{h}+\bm{g}))
+\end{equation}
+
+where $\bm{h}$ is some hidden state (ie.\ of an RNN), $\bm{g}$ is drawn from a
+Gumbel distribution and $\tau$ is a temperature parameter. This works because it
+is differentiable and as $\tau \to 0$ the distribution of $\bm{y}$ will match
+that we get from
+
+\begin{equation}
+    \bm{y} = \text{one\_hot}(\argmax_{i}(h_i + g_i))
+\end{equation}
+
+which again can be shown to be the same as sample $\bm{y}$ from a probability
+distribution $\bm{p} = softmax(\bm{h})$ where $p_i = p(y_i=1), i = 1\dots d$.
+
+Finally, for other examples on the third approach,
+see~\cite{donahue2018adversarial} and~\cite{haidar2019textkdgan}.
 
 \section{Method}\label{sec:method}
 
