@@ -253,6 +253,35 @@ encoding is added, as suggested in the paper (\cite{vaswani2017attention}).
 
 \subsubsection{RNN and Attention based Autoencoder}\label{sec:attnRNN}
 
+In our second model, the heavy-lifting is switched from the encoder to the
+decoder. Again, we utilize the attention mechanism, but this time it is combined
+with an RNN architecture, more precisely a Gated Recurrent Unit (GRU). In this
+model, the encoder is simply a GRU layer that processes the entire sequence and
+then its final hidden state aswell as the output for each word in the sequence
+is passed to the decoder.
+
+The decoder has a bit more to it. On each timestep it takes in its own last
+output (starting with the special \texttt{start-of-sequence}-token), a hidden
+state (starting with the last hidden state of the encoder) and all the encoder
+outputs. It then uses a linear layer (ie.\ a simple feed-forward network) to
+calculate the attention weights by combining the input and the current hidden
+state. The attention weights and the encoder outputs are then mulitplied
+together using matrix multiplication and the result of this operation can then be
+merged with the original input and passed through another linear layer to
+produce a vector of size \texttt{(sequence\_length * hidden\_size)}.
+
+In this vector, the decoder has now embedded all the information about where to
+focus its attention, and it can pass this to a GRU just as in the encoder ---
+however, opposite to the GRU in the encoder, the output of the recurrent layer
+in the decoder is responsible for mapping back to actual words. This mapping is
+finalized by an output linear layer that expands the hidden size to the size of
+the vocabulary and then, finally, a $softmax$ operation converts the output to
+probability distributions.
+
+When the decoder outputs the special \texttt{end-of-sequence}-token it is
+finished and the process terminates. Our implementation of this model is based
+on~\cite{pytorchTutorialAtt}.
+
 
 \subsubsection{Simple GAN}\label{sec:simpleGAN}
 
