@@ -19,6 +19,10 @@ class DataManager:
         self.test_data, _ = self.get_sentences(self.test_path)
         self.dev_data, _ = self.get_sentences(self.dev_path)
 
+        print(f"len(train) = {len(self.train_data)}")
+        print(f"len(test) = {len(self.test_data)}")
+        print(f"len(dev) = {len(self.dev_data)}")
+
         mappings = self.make_idx_mappings(self.vocab)
         self.word2idx = mappings[0]
         self.idx2word = mappings[1]
