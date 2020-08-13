@@ -7,7 +7,7 @@ import random
 from random import shuffle
 
 from models import EncoderRNN, AttnDecoderRNN
-from reader import DataManager
+from reader_sentences import DataManager
 from utils import showPlot, asMinutes, timeSince
 
 from polyglot.mapping import Embedding, CaseExpander
@@ -40,7 +40,8 @@ teacher_forcing_ratio = 0.5
 
 def train(batch, encoder, decoder,
           optim_enc, optim_dec, criterion, max_length=MAX_LENGTH):
-
+    encoder.train()
+    decoder.train()
     optim_enc.zero_grad()
     optim_dec.zero_grad()
 
@@ -104,32 +105,38 @@ def trainIters(encoder, decoder, n_iters,
 
     criterion = nn.NLLLoss()
 
-    data = [random.choice(train_d) for _ in range(n_iters)]
-    for epoch in range(1, n_iters + 1):
+    try:
+        data = [random.choice(train_d) for _ in range(n_iters)]
+        for epoch in range(1, n_iters + 1):
 
-        sentence = data[epoch - 1].to(device)
-        loss = train(sentence, encoder, decoder,
-                     optim_enc, optim_dec, criterion)
+            sentence = data[epoch - 1].to(device)
+            loss = train(sentence, encoder, decoder,
+                         optim_enc, optim_dec, criterion)
 
-        print_loss_total += loss
-        plot_loss_total += loss
+            print_loss_total += loss
+            plot_loss_total += loss
 
-        if epoch % print_every == 0:
-            print_loss_avg = print_loss_total / print_every
-            print_loss_total = 0
-            print('%s (%d %d%%) %.4f' % (timeSince(start, epoch / n_iters),
-                                         epoch, epoch / n_iters * 100, print_loss_avg))
-            evaluateRandomly(encoder, decoder, 1)
+            if epoch % print_every == 0:
+                print_loss_avg = print_loss_total / print_every
+                print_loss_total = 0
+                print('%s (%d %d%%) %.4f' % (timeSince(start, epoch / n_iters),
+                                             epoch, epoch / n_iters * 100, print_loss_avg))
+                evaluateRandomly(encoder, decoder, 1)
 
-        if epoch % plot_every == 0:
-            plot_loss_avg = plot_loss_total / plot_every
-            plot_losses.append(plot_loss_avg)
-            plot_loss_total = 0
+            if epoch % plot_every == 0:
+                plot_loss_avg = plot_loss_total / plot_every
+                plot_losses.append(plot_loss_avg)
+                plot_loss_total = 0
+    except KeyboardInterrupt:
+        print('-' * 89)
+        print('Exiting from training early')
 
     showPlot(plot_losses)
 
 
 def evaluate(encoder, decoder, sentence, max_length=MAX_LENGTH):
+    encoder.eval()
+    encoder.eval()
     with torch.no_grad():
         input_tensor = dm.to_idxs(sentence).view(-1, 1).to(device)
         input_length = input_tensor.shape[0]
@@ -176,5 +183,12 @@ def evaluateRandomly(encoder, decoder, n=10):
         print('<', output_sentence)
         print('')
 
+
+# encoder.load_state_dict(torch.load("saved_models/EncoderRNN_batch64_20000_iters_part4_batch2_new_data.pt"))
+# decoder.load_state_dict(torch.load("saved_models/AttnDecoder_batch64_20000_iters_part4_batch2_new_data.pt"))
+encoder.load_state_dict(torch.load("saved_models/encoder_exp.pt"))
+decoder.load_state_dict(torch.load("saved_models/decoder_exp.pt"))
 trainIters(encoder, decoder, 20000)
+torch.save(encoder.state_dict(), "saved_models/encoder_exp.pt")
+torch.save(decoder.state_dict(), "saved_models/decoder_exp.pt")
 evaluateRandomly(encoder, decoder)
