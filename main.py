@@ -102,13 +102,12 @@ def run(padding_eos):
                     for word, predicted in zip(sentence, pred_sentence):
                         word = word.item()
                         predicted = predicted.item()
+                        if not padding_eos and word == dm.PAD_IDX:
+                            continue
+
                         total_words += 1
-                        if padding_eos:
-                            if word == predicted:
-                                correct_words += 1
-                        else:
-                            if word == predicted and predicted != dm.PAD_IDX:
-                                correct_words += 1
+                        if word == predicted:
+                            correct_words += 1
         return correct_words / total_words
 
     def evaluate(eval_model, data_source):
@@ -216,7 +215,7 @@ def run(padding_eos):
     if os.path.isfile(path):
         model.load_state_dict(torch.load(path))
     else:
-        model = train_multiple_epochs(200, '_padding-eos' if padding_eos else '')
+        model = train_multiple_epochs(100, '_padding-eos' if padding_eos else '')
         torch.save(model.state_dict(), path)
 
     # model.load_state_dict(torch.load("saved_models/20epochs_with_max_seq_len128.pt"))
