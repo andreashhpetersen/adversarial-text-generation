@@ -25,6 +25,10 @@ class DataManager:
         self.test_data = dev_test_data[int(len(dev_test_data)/2):]
         self.dev_data = dev_test_data[:int(len(dev_test_data)/2)]
 
+        print(f"len(train) = {len(self.train_data)}")
+        print(f"len(test) = {len(self.test_data)}")
+        print(f"len(dev) = {len(self.dev_data)}")
+
         mappings = self.make_idx_mappings(self.vocab)
         self.word2idx = mappings[0]
         self.idx2word = mappings[1]
