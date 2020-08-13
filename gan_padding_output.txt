@@ -1,0 +1,8 @@
+defendant straight straight forgiven shiner inherited capital lover lover deceptive bewildered snuck snuck <PAD> <PAD>
+[1/10][12100/17945]	Loss_D: 0.7832	Loss_G: 3.6806	D(x): 0.3328	D(G(z)): 0.0326 / 0.0337
+[1/10][12150/17945]	Loss_D: 0.9535	Loss_G: 2.7830	D(x): 0.3780	D(G(z)): 0.0192 / 0.0722
+[1/10][12200/17945]	Loss_D: 0.1760	Loss_G: 2.3358	D(x): 0.4997	D(G(z)): 0.1586 / 0.1514
+[1/10][12250/17945]	Loss_D: 0.0225	Loss_G: 4.7734	D(x): 0.4998	D(G(z)): 0.0218 / 0.0115
+[1/10][12300/17945]	Loss_D: 1.7395	Loss_G: 2.2649	D(x): 0.2661	D(G(z)): 0.0375 / 0.1132
+[1/10][12350/17945]	Loss_D: 0.0396	Loss_G: 3.1844	D(x): 0.5000	D(G(z)): 0.0385 / 0.0443
+
