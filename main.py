@@ -102,7 +102,7 @@ def run(padding_eos):
                     for word, predicted in zip(sentence, pred_sentence):
                         word = word.item()
                         predicted = predicted.item()
-                        if not padding_eos and predicted == dm.PAD_IDX:
+                        if not padding_eos and word == dm.PAD_IDX:
                             continue
 
                         total_words += 1
