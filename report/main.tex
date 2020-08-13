@@ -344,7 +344,22 @@ learning the actual sentence, which generally is what is of interest. However,
 we wanted our Student model to learn both from a Teacher that had learned
 padding and one that hadn't, so trained the autoencoders (Teacher) on both.
 
+In training the RNN-based model we took inspiration
+from~\cite{pytorchTutorialAtt}. This means we set the learning rate to 0.01 and
+instead of training on the entire training set over multiple epochs, we let the
+model randomly pick a data batch, train on that and then pick a new for 60,000
+iterations. Furthermore, we used teacher forcing, where instead of letting the
+output of the decoder be its own next input, we give the actual next input (from
+the target sentence). This approach can lead to some terrible cases of
+overfitting and preventing the model form learning its mistakes properly, but in
+the right dose it can also help the model converge faster. Therefore, for each
+training instance, we chose with 50\% probability wether to use teacher forcing
+or not.
 
+
+\subsubsection{Training the GAN model}
+
+bla bla
 
 \section{Analysis}\label{sec:analysis}
 
@@ -361,6 +376,7 @@ padding and one that hadn't, so trained the autoencoders (Teacher) on both.
 \section{Conclusion}\label{sec:conclusion}
 
 
+\newpage
 \printbibliography%
 
 \end{document}
