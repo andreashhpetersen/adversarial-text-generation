@@ -110,6 +110,10 @@ def run(padding_eos):
     num_epochs = 10
     source_model.eval()
     source_model.requires_grad_(False)
+    best_models_1 = (G, D)
+    best_D_G_z1 = -math.inf
+    best_models_2 = (G, D)
+    best_D_G_z2 = -math.inf
     try:
         for epoch in range(num_epochs):
             G.train()
@@ -153,6 +157,10 @@ def run(padding_eos):
 
                 D_G_z1 = output.mean().item()
 
+                if(D_G_z1 > best_D_G_z1 and D_x > 0.35):
+                    best_D_G_z1 = D_G_z1
+                    best_models_1 = (G, D)
+
                 # Update D
                 optimizerD.step()
 
@@ -166,6 +174,10 @@ def run(padding_eos):
                 errG = criterion(output, label)
                 errG.backward()
                 D_G_z2 = output.mean().item()
+
+                if (D_G_z2 > best_D_G_z2 and D_x > 0.35):
+                    best_D_G_z2 = D_G_z2
+                    best_models_2 = (G, D)
 
                 # Update G
                 optimizerG.step()
@@ -197,8 +209,16 @@ def run(padding_eos):
     torch.save(G.state_dict(), f"saved_models/gan_generator{suffix}.pt")
     torch.save(D.state_dict(), f"saved_models/gan_discriminator{suffix}.pt")
 
+    best_G1, best_D1 = best_models_1
+    torch.save(best_G1.state_dict(), f"saved_models/best1_gan_generator{suffix}.pt")
+    torch.save(best_D1.state_dict(), f"saved_models/best1_gan_discriminator{suffix}.pt")
+
+    best_G2, best_D2 = best_models_2
+    torch.save(best_G2.state_dict(), f"saved_models/best2_gan_generator{suffix}.pt")
+    torch.save(best_D2.state_dict(), f"saved_models/best2_gan_discriminator{suffix}.pt")
+
     with open(f"saved_models/gan{suffix}.stats.json", "w") as file:
-        json.dumps({"G_losses": G_losses, "D_losses": D_losses})
+        json.dumps({"G_losses": G_losses, "D_losses": D_losses, "best_D_G_z1": best_D_G_z1, "best_D_G_z2": best_D_G_z2})
 
     plt.figure(figsize=(10, 5))
     plt.title("Generator and Discriminator Loss During Training")
