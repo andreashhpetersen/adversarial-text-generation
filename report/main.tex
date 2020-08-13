@@ -228,8 +228,8 @@ and a vocabulary of 13,731 tokens.
 
 \subsection{Models}\label{sec:models}
 
-We developed two different versions of the autoencoder model and also two
-different GANs. These will be described in this subsection.
+We developed two different versions of the autoencoder model and one GAN model.
+These will be described in this subsection.
 
 \subsubsection{The TransformerModel}\label{sec:transformermodel}
 
@@ -283,11 +283,31 @@ finished and the process terminates. Our implementation of this model is based
 on~\cite{pytorchTutorialAtt}.
 
 
-\subsubsection{Simple GAN}\label{sec:simpleGAN}
+\subsubsection{GAN}\label{sec:modelGAN}
 
+Our GAN model is modelled after our TransformerModel in an attempt to mimic the
+inner mechanics of the network it is trying to imitate. As stated, a GAN
+consists of a generator and a discriminator. The generator gets a vector of
+random noise as input. This vector has dimensions \texttt{(max\_sequence\_length
+* embedding\_size)}. The reason we set a parameter
+\texttt{max\_sequence\_length} is because neural networks expects static sizes,
+but since sentences can have different lengths, we set an upper bound. The
+generator should, however, be able to encode its output in a way, that produces
+sentences of length 0 to \texttt{max\_sequence\_length} (ie.\ by encoding an
+\texttt{end-of-sequence}-token at some position).
 
-\subsubsection{Transformer GAN}\label{sec:simpleGAN}
+The generator passes its input through a linear layer and then, as the
+TransformerModel, adds positional encoding before it runs it through an encoder
+stack (\texttt{nn.TransformerEncoder}). The final output has the same shape as
+the output of the encoder part of the TransformerModel.
 
+The discriminator has almost the same structure as the generator (it uses
+positional encoding and an encoder stack), but the input differs and it outputs
+a single number between 0 and 1. Recall, that the job of the discriminator is to
+decide wether its input was generated from random noise via the generator or if
+it was an encoding stemming from a real sentence passed through a trained
+encoder. Thus, it is effectively a binary classifier, and its output should
+describe its conviction that the input is `true'.
 
 \subsection{Training}\label{sec:training}
 
