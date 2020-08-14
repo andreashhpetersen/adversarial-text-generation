@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import math
 import torch
@@ -13,6 +14,7 @@ from reader_sentences import DataManager
 
 from polyglot.mapping import Embedding, CaseExpander
 from pathlib import Path
+
 
 def run(padding_eos):
     dm = DataManager(normalize_to_max_seq_len_and_eos=False, eos=True)
@@ -53,7 +55,6 @@ def run(padding_eos):
     lr = 0.05  # learning rate
     optimizer = torch.optim.SGD(model.parameters(), lr=lr)
 
-
     def train_epoch(epoch):
         model.train()  # Turn on the training mode
         total_loss = 0.
@@ -84,7 +85,6 @@ def run(padding_eos):
                     cur_loss, math.exp(cur_loss)))
                 total_loss = 0
                 start_time = time.time()
-
 
     def accuracy(eval_model, data_source):
         eval_model.eval()  # Turn on the evaluation mode
@@ -122,7 +122,6 @@ def run(padding_eos):
                 total_loss += len(data) * criterion(output_flat, targets).item()
         return total_loss / (len(data_source) - 1)
 
-
     ######################################################################
     # Loop over epochs. Save the model if the validation loss is the best
     # we've seen so far.
@@ -130,12 +129,11 @@ def run(padding_eos):
     def train_multiple_epochs(epochs, plot_name=""):
         best_val_loss = evaluate(model, dev_d)
         best_model = model
-        stats = {'train_loss':[],'valid_loss':[], 'valid_acc': [], 'train_acc': []}
+        stats = {'train_loss': [], 'valid_loss': [], 'valid_acc': [], 'train_acc': []}
         if padding_eos:
             stats_path = f"saved_models/transformer-padding-eos.stats.json"
         else:
             stats_path = f"saved_models/transformer.stats.json"
-
 
         # You may bail early using ctrl+c
         try:
@@ -149,10 +147,10 @@ def run(padding_eos):
                 print('-' * 89)
                 print('| end of epoch {:3d} | time: {:5.2f}s | valid loss {:5.2f} | '
                       'valid ppl {:8.2f} | train loss {:5.2f}'.format(epoch, (time.time() - epoch_start_time),
-                                                 val_loss, math.exp(val_loss), train_loss))
+                                                                      val_loss, math.exp(val_loss), train_loss))
 
-                batch = random.randint(0,len(test_d)-1)
-                y_true = test_d[batch][:,:3].to(device)
+                batch = random.randint(0, len(test_d) - 1)
+                y_true = test_d[batch][:, :3].to(device)
                 y_pred = model.predict(y_true)
 
                 for yt, yp in zip(*list(map(dm.to_sentence, [y_true, y_pred]))):
@@ -203,17 +201,19 @@ def run(padding_eos):
 
         return best_model
 
-    def human_eval(i):
+    def human_eval(i, sub_i=0):
         model.eval()
-        ex = test_d[i][:, 1].view(-1, 1).to(device)
+        ex = test_d[i][:, sub_i].view(-1, 1).to(device)
         print("Actual:")
         print(' '.join(dm.idx2word[w.item()] for w in ex[ex != 0]))
         y_pred = model.predict(ex)
         print("Predicted:")
         print(' '.join(dm.idx2word[w.item()] for w in y_pred))
 
-    if padding_eos: path = f"saved_models/transformer-padding-eos.pt"
-    else: path = f"saved_models/transformer.pt"
+    if padding_eos:
+        path = f"saved_models/transformer-padding-eos.pt"
+    else:
+        path = f"saved_models/transformer.pt"
 
     if os.path.isfile(path):
         model.load_state_dict(torch.load(path))
@@ -242,9 +242,20 @@ def run(padding_eos):
     print('| End of training | test accuray {:5.2f}'.format(test_acc))
     print('=' * 89)
 
-    for i in range(10):
-        human_eval(i)
+    for i in range(len(test_d)):
+        for i in range(len(test_d[0])):
+            human_eval(i)
 
     # print(model.state_dict())
 
     return model
+
+if __name__ == '__main__':
+    if sys.argv[1] == "True":
+        run(True)
+
+    elif sys.argv[1] == "False":
+        run(False)
+
+    else:
+        raise Exception()
