@@ -7,7 +7,7 @@ import random
 from random import shuffle
 
 from models import EncoderRNN, AttnDecoderRNN
-from reader_sentences import DataManager
+from data_manager_sentences import DataManager
 from utils import showPlot, asMinutes, timeSince
 
 from polyglot.mapping import Embedding, CaseExpander

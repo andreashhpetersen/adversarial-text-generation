@@ -17,7 +17,7 @@ is trained to distinguish between the continuous outputs of a pre-trained
 encoder from a Transformer model given a 'true' sentence from the generated,
 'fake' output stemming from our generator.
 
-![model](./images/project_model.png "Proposed Model")
+![model](report/images/projectModel.png "Proposed Model")
 
 In our model, we will use a pre-trained Transformer (ie. by using BERT) that
 can encode and decode a sentence from English to English. The encoded sentences

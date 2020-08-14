@@ -8,3 +8,4 @@
 *.blg
 *.run.xml
 __pycache__
+.idea
