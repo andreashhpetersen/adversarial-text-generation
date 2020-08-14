@@ -13,7 +13,7 @@ from IPython.core.debugger import set_trace
 import torch.nn.functional as F
 
 from models import TransformerModel, SimpleGenerator, SimpleDiscriminator, EncoderDiscriminator, EncoderGenerator
-from reader_sentences import DataManager
+from data_manager_sentences import DataManager
 
 from polyglot.mapping import Embedding, CaseExpander
 from pathlib import Path

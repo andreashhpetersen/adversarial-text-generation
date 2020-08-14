@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import json
 
 from models import TransformerModel, Generator, Discriminator
-from reader_sentences import DataManager
+from data_manager_sentences import DataManager
 
 from polyglot.mapping import Embedding, CaseExpander
 from pathlib import Path
