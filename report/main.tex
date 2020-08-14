@@ -437,13 +437,6 @@ Here are some plots:
 
 \end{figure}
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.5\textwidth]{transformer_padding-eos.png}
-    \caption{%
-        Transformer with padding and EOS
-    }\label{fig:transformerPaddingEOS}
-\end{figure}
 
 This is output from a TransformerModel during training:
 
@@ -482,6 +475,20 @@ how they become almost identical.
 
 SGD seem to make the network more stable, but it also tends to end up with small
 sentences of identical words and a LOT of padding.
+
+Training with no encoded random words went fine for very long, with the
+generator actually being consistently better than the discriminator --- untill it
+the hit a giant collapse (see
+\texttt{../examples/GAN-training-output-double\_batch-Adam-no\_random.txt}
+and~\ref{fig:doubleBatchAdamNoRandom} for evidence)
+
+\begin{figure}[h]
+    \captionsetup{width=\textwidth}
+    \includegraphics[width=\textwidth,height=12cm]{GAN-loss-double_batch-Adam-no_random.png}
+    \caption{%
+        GAN loss for setup with Adam, double batch and no encoded random words.
+    }\label{fig:doubleBatchAdamNoRandom}
+\end{figure}
 
 \section{Further research}\label{sec:furtherResearch}
 
