@@ -605,13 +605,13 @@ but should make training the GAN much easier. As such getting a good Teacher mod
 approach could potentially lead to large improvements in the GAN model.
 
 \section{Conclusion}\label{sec:conclusion}
-Training sentence embeddings is possible without problems
+Training sentence embeddings is possible without problems,
 when the embedded size is the same size as the input.
 We achieve a 0.99 word accuracy, with room for improvement in model/training.
 
-Training sentence embeddings is difficult when the embedded
-size has a fixed size, but further research is necessary.
-We achieve promising results, but sentences look very messy.
+Training sentence embeddings that are decodable is difficult, when the embedded
+size has a fixed size, further research is necessary.
+We achieve promising results, but the sentences still look very messy.
 
 Training a GAN on sentence embeddings with a variable size without
 EOS tokens is very difficult. We recommend using EOS tokens and/or possibly
