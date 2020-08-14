@@ -18,8 +18,8 @@ from pathlib import Path
 
 
 def run(padding_eos):
-    dm = DataManager(max_seq_len=15, normalize_to_max_seq_len_and_eos=True, eos=padding_eos)
-    batch_size = 4
+    dm = DataManager(max_seq_len=10, normalize_to_max_seq_len_and_eos=True, eos=padding_eos)
+    batch_size = 8
     train_d, test_d, dev_d = dm.get_batched_data(batch_sz=batch_size)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -137,14 +137,16 @@ def run(padding_eos):
                 errD_real = criterion(output_real, label)
                 errD_real.backward()
 
-                ## Train with all-fake batch from encoder
-                encoded_fakes = source_model.encode(random_words(batch))
-                label.fill_(fake_label)
-                output_fake = D(encoded_fakes)
-                errD_fake_encoded = criterion(output_fake, label)
-                errD_fake_encoded.backward()
+                D_x = output_real.mean().item()
 
-                D_x = torch.cat([output_real, output_fake]).mean().item()
+                ## Train with all-fake batch from encoder
+                # encoded_fakes = source_model.encode(random_words(batch))
+                # label.fill_(fake_label)
+                # output_fake = D(encoded_fakes)
+                # errD_fake_encoded = criterion(output_fake, label)
+                # errD_fake_encoded.backward()
+
+                # D_x = torch.cat([output_real, output_fake]).mean().item()
 
                 ## Train with all-fake batch
                 label.fill_(fake_label)
@@ -169,7 +171,12 @@ def run(padding_eos):
                 ###########################
                 G.zero_grad()
 
-                label.fill_(real_label)
+                # label.fill_(real_label)
+
+                label = torch.full((batch_sz*2,), real_label, device=device)
+                noise = torch.randn((dm.max_seq_len, batch_sz, emsize), device=device)
+                fake2 = G(noise)
+                fake = torch.cat((fake, fake2), dim=1)
                 output = D(fake).view(-1)
                 errG = criterion(output, label)
                 errG.backward()
@@ -184,9 +191,8 @@ def run(padding_eos):
 
                 # Output training stats
                 if i % 50 == 0:
-                    print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f'
-                          % (epoch, num_epochs, i, len(batch_idxs),
-                             errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
+                    msg = '[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f' % (epoch, num_epochs, i, len(batch_idxs), errD.item(), errG.item(), D_x, D_G_z1, D_G_z2)
+                    print(msg)
 
                 # Save Losses for plotting later
                 G_losses.append(errG.item())
@@ -196,28 +202,42 @@ def run(padding_eos):
                 if (iters % 500 == 0) or ((epoch == num_epochs - 1) and (i == len(batch_idxs) - 1)):
                     with torch.no_grad():
                         G.eval()
-                        fake = G(fixed_noise).detach()
-                        decoded = source_model.decode(fake)
-                        probs = F.softmax(decoded, dim=2).view(dm.max_seq_len, voc_sz)
-                        print(dm.to_sentence(torch.argmax(probs, dim=1)))
+                        random_noise = torch.randn((dm.max_seq_len, 1,
+                                                    emsize)).to(device)
+                        with open('./examples/some-training-type.txt', 'a') as f:
+                            f.write(f'{msg}\n')
+                            for noise in [fixed_noise, random_noise]:
+                                fake = G(noise).detach()
+                                decoded = source_model.decode(fake)
+                                probs = F.softmax(decoded, dim=2).view(
+                                    dm.max_seq_len, voc_sz)
+                                sent = dm.to_sentence(torch.argmax(probs, dim=1))
+                                f.write(f'{sent}\n')
+                                print(sent)
 
                 iters += 1
     except KeyboardInterrupt:
         print('-' * 89)
         print('Exiting from training early')
 
-    torch.save(G.state_dict(), f"saved_models/gan_generator{suffix}.pt")
-    torch.save(D.state_dict(), f"saved_models/gan_discriminator{suffix}.pt")
+    torch.save(G.state_dict(),
+               f"saved_models/gan_generator{suffix}-Adam-double_batch.pt")
+    torch.save(D.state_dict(),
+               f"saved_models/gan_discriminator{suffix}-Adam-double_batch.pt")
 
     best_G1, best_D1 = best_models_1
-    torch.save(best_G1.state_dict(), f"saved_models/best1_gan_generator{suffix}.pt")
-    torch.save(best_D1.state_dict(), f"saved_models/best1_gan_discriminator{suffix}.pt")
+    torch.save(best_G1.state_dict(),
+               f"saved_models/best1_gan_generator{suffix}-Adam-double_batch.pt")
+    torch.save(best_D1.state_dict(),
+               f"saved_models/best1_gan_discriminator{suffix}-Adam-double_batch.pt")
 
     best_G2, best_D2 = best_models_2
-    torch.save(best_G2.state_dict(), f"saved_models/best2_gan_generator{suffix}.pt")
-    torch.save(best_D2.state_dict(), f"saved_models/best2_gan_discriminator{suffix}.pt")
+    torch.save(best_G2.state_dict(),
+               f"saved_models/best2_gan_generator{suffix}-Adam-double_batch.pt")
+    torch.save(best_D2.state_dict(),
+               f"saved_models/best2_gan_discriminator{suffix}-Adam-double_batch.pt")
 
-    with open(f"saved_models/gan{suffix}.stats.json", "w") as file:
+    with open(f"saved_models/gan{suffix}-SGD.stats.json", "w") as file:
         json.dumps({"G_losses": G_losses, "D_losses": D_losses, "best_D_G_z1": best_D_G_z1, "best_D_G_z2": best_D_G_z2})
 
     plt.figure(figsize=(10, 5))
