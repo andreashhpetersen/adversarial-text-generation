@@ -412,12 +412,55 @@ the model collapse spectacularly.
 
 \section{Analysis}\label{sec:analysis}
 
+In this section, we will present and discuss our results as well as give
+suggestions for further improvements and research.
 
 \subsection{Results}\label{sec:results}
 
+Here are some plots:
+
+\begin{figure}[h]
+    \centering
+    \begin{minipage}{0.45\textwidth}
+        \includegraphics[width=0.9\textwidth]{transformer.png}
+        \caption{%
+            Transformer.png
+        }\label{fig:transformer}
+    \end{minipage}
+    \begin{minipage}{0.45\textwidth}
+        \includegraphics[width=0.9\textwidth]{transformer_padding-eos.png}
+        \caption{%
+            Transformer with padding and EOS
+        }\label{fig:transformerPaddingEOS}
+    \end{minipage}
+
+
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{transformer_padding-eos.png}
+    \caption{%
+        Transformer with padding and EOS
+    }\label{fig:transformerPaddingEOS}
+\end{figure}
+
+This is output from a TransformerModel during training:
+
+\begin{verbatim}
+| end of epoch   5 | time: 466.09s | valid loss  3.07 | valid ppl    21.58 | train loss  2.63
+IN:  rwandan rebels are pushing their offensive south as fighting continues in the capital kigali . <EOS>
+OUT: honest guys are noticed their interesting south as fighting awake in 
+\end{verbatim}
 
 \subsection{Discussion}\label{sec:discussion}
 
+The GAN network is actually able to learn.
+Sentences differ from random input.
+Increasing the batch size of $z$ might help the generator.
+Examples of D(x) being 0.25 and D(G(z)) being 0.5 / 0.5
+The training breaks too soon
+Discriminator gets to critical
 
 \section{Further research}\label{sec:furtherResearch}
 
