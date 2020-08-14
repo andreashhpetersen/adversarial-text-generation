@@ -196,7 +196,7 @@ see~\cite{donahue2018adversarial} and~\cite{haidar2019textkdgan}.
 
 For all our models (autoencoders and GANs), we drew inspiration PyTorch
 tutorials
-(\cite{pytorchTutorialAtt},~\cite{pytorchTutorialTransformer},~\cite{pytorchTutorialGAN}),
+(\cite{pytorchTutorialAtt}, \cite{pytorchTutorialTransformer}, \cite{pytorchTutorialGAN}),
 tweaking them to our specific needs. The whole process (project development,
 research, data collection, coding, training, experimentation and analysis) was
 conducted during a 10-day period.
@@ -857,12 +857,12 @@ to converge and only got to sub-par results.
 We did manage to construct a GAN model that produced sentences with some
 resemblance to the distribution it was trying to estimate. Especially, it seemed
 to be able to end sentences properly (with punctuation,
-\texttt{end-of-sequence}-tokens and padding) and its sentence-construct
+\texttt{end-of-sequence}-tokens and padding) and its sentence-constructs were
 different from total randomness.
 
 However, the GAN model (when trained with Adam as its optimization algorithm)
 always seemed to collapse at some point during training, where the generator
-would no longer be able to get a sentence passed the discriminator. We tried
+would no longer be able to get a sentence past the discriminator. We tried
 increasing the batch size for the generator and also to stop training the
 discriminator on encoded random words, but this only alleviated the problem so
 much. Also, we saw that not using encoded random words preserved the stability
@@ -873,10 +873,9 @@ seemingly meaningful sentence-constructs (especially in regards to
 With SGD, the model would not collapse, but instead it tended towards producing
 very short sentences with a very, very low non-sensical vocabulary.
 
-All in all, a better sentence encoding model and a more stable GAN model with
-more optimized hyperparameters and inner architecture would be needed, if the
-model were to produce sentences of any meaning to a human. As such, our model
-did not do that.
+In conclusion our models did not produce sentences that were of any meaning to a human.
+Our results indicate that better hyperparameters and a different inner architecture could
+result in a GAN with more meaningful output.
 
 \newpage
 \printbibliography%
