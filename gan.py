@@ -137,16 +137,14 @@ def run(padding_eos):
                 errD_real = criterion(output_real, label)
                 errD_real.backward()
 
-                D_x = output_real.mean().item()
-
                 ## Train with all-fake batch from encoder
-                # encoded_fakes = source_model.encode(random_words(batch))
-                # label.fill_(fake_label)
-                # output_fake = D(encoded_fakes)
-                # errD_fake_encoded = criterion(output_fake, label)
-                # errD_fake_encoded.backward()
+                encoded_fakes = source_model.encode(random_words(batch))
+                label.fill_(fake_label)
+                output_fake = D(encoded_fakes)
+                errD_fake_encoded = criterion(output_fake, label)
+                errD_fake_encoded.backward()
 
-                # D_x = torch.cat([output_real, output_fake]).mean().item()
+                D_x = torch.cat([output_real, output_fake]).mean().item()
 
                 ## Train with all-fake batch
                 label.fill_(fake_label)
