@@ -1,0 +1,138 @@
+[0/10][0/6765]  Loss_D: 1.8526  Loss_G: 0.6623  D(x): 0.5776    D(G(z)): 0.5878 / 0.5499
+know for know i'm i'm the for good some i'm
+
+[0/10][500/6765]        Loss_D: 1.7199  Loss_G: 0.6846  D(x): 0.2188    D(G(z)): 0.5105 / 0.5054
+your appropriated make ? but <PAD> <EOS> <EOS> <PAD> <PAD>
+
+
+[0/10][1000/6765]       Loss_D: 1.3470  Loss_G: 0.7206  D(x): 0.2797    D(G(z)): 0.4942 / 0.4927
+had had had had had had <EOS> <EOS> <EOS> <EOS>
+
+
+[0/10][1500/6765]       Loss_D: 1.4394  Loss_G: 0.6927  D(x): 0.2413    D(G(z)): 0.4961 / 0.5053
+? do it did <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
+
+
+[0/10][2000/6765]       Loss_D: 1.2057  Loss_G: 0.9821  D(x): 0.2932    D(G(z)): 0.4748 / 0.3959
+your out out out out out <EOS> <EOS> <PAD> <PAD>
+
+
+[0/10][2500/6765]       Loss_D: 0.1204  Loss_G: 3.0546  D(x): 0.4769    D(G(z)): 0.0502 / 0.1293
+<EOS> <EOS> <EOS> <EOS> <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
+
+
+[0/10][2500/6765]       Loss_D: 0.1204  Loss_G: 3.0546  D(x): 0.4769    D(G(z)): 0.0502 / 0.1293
+<EOS> <EOS> <EOS> <EOS> <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
+
+
+[0/10][3500/6765]       Loss_D: 0.7246  Loss_G: 2.5976  D(x): 0.4272    D(G(z)): 0.3368 / 0.1522
+have tom ? <EOS> <EOS> <EOS> . <PAD> <PAD> <PAD>
+
+
+[0/10][4000/6765]       Loss_D: 0.6219  Loss_G: 2.3160  D(x): 0.4347    D(G(z)): 0.3195 / 0.2272
+good went feel <PAD> <PAD> . <PAD> <EOS> <PAD> <PAD>
+
+
+[0/10][4500/6765]       Loss_D: 0.1453  Loss_G: 3.1803  D(x): 0.4851    D(G(z)): 0.1029 / 0.0734
+is you you turn next next . <EOS> <PAD> <PAD>
+
+
+[0/10][5000/6765]       Loss_D: 0.4988  Loss_G: 3.1522  D(x): 0.4863    D(G(z)): 0.2732 / 0.0934
+given to to to to to . <EOS> <PAD> <PAD>
+
+
+[0/10][5500/6765]       Loss_D: 0.4193  Loss_G: 1.9062  D(x): 0.4415    D(G(z)): 0.1620 / 0.2017
+he that's that's drive drive drive drive . <EOS> <PAD>
+
+
+[0/10][6000/6765]       Loss_D: 0.5679  Loss_G: 3.2336  D(x): 0.3913    D(G(z)): 0.0496 / 0.0650
+long you'd unless unless unless getting getting . <EOS> <PAD>
+
+
+[0/10][6500/6765]       Loss_D: 0.2860  Loss_G: 2.0044  D(x): 0.4564    D(G(z)): 0.1232 / 0.1604
+tom still has has has all have . <EOS> <PAD>
+
+
+[1/10][200/6765]        Loss_D: 0.1703  Loss_G: 5.9216  D(x): 0.4910    D(G(z)): 0.1176 / 0.0055
+i i afraid afraid <EOS> <EOS> <EOS> <EOS> <PAD> <PAD>
+
+
+[1/10][700/6765]        Loss_D: 0.2250  Loss_G: 3.3731  D(x): 0.4675    D(G(z)): 0.1131 / 0.0416
+trying is ? ? ? <PAD> . <EOS> <PAD> <PAD>
+
+
+[1/10][1200/6765]       Loss_D: 0.3189  Loss_G: 2.0577  D(x): 0.4716    D(G(z)): 0.1825 / 0.1878
+rather to to to to himself . <EOS> <PAD> <PAD>
+
+
+[1/10][1700/6765]       Loss_D: 0.4160  Loss_G: 2.9580  D(x): 0.4304    D(G(z)): 0.1905 / 0.1037
+i i . fun fun bag <EOS> <EOS> <PAD> <PAD>
+
+[1/10][2200/6765]       Loss_D: 1.0804  Loss_G: 2.0079  D(x): 0.2871    D(G(z)): 0.1996 / 0.1830
+is girlfriend at with to . . <EOS> <PAD> <PAD>
+
+
+[1/10][2700/6765]       Loss_D: 0.8162  Loss_G: 3.0662  D(x): 0.3827    D(G(z)): 0.1234 / 0.0772
+does is have have have during . <EOS> <PAD> <PAD>
+
+
+[1/10][3200/6765]       Loss_D: 0.2863  Loss_G: 2.4936  D(x): 0.4612    D(G(z)): 0.1539 / 0.0970
+the play you <EOS> . strange <PAD> <EOS> <PAD> <PAD>
+
+
+[1/10][3700/6765]       Loss_D: 0.5299  Loss_G: 2.1744  D(x): 0.4360    D(G(z)): 0.1643 / 0.1207
+i song took have the saturday ? . <EOS> <PAD>
+
+
+[1/10][4200/6765]       Loss_D: 0.8735  Loss_G: 1.6204  D(x): 0.3829    D(G(z)): 0.1837 / 0.2078
+i off understand smell smell to about . <EOS> <PAD>
+
+
+[1/10][4700/6765]       Loss_D: 0.0233  Loss_G: 4.8455  D(x): 0.4992    D(G(z)): 0.0192 / 0.0089
+do her down , mary we we you you you
+
+
+[1/10][5200/6765]       Loss_D: 0.7160  Loss_G: 1.6972  D(x): 0.3886    D(G(z)): 0.2853 / 0.2059
+you appointment roof that's that's . <EOS> <PAD> <PAD> <PAD>
+
+
+[1/10][5700/6765]       Loss_D: 0.6118  Loss_G: 1.7379  D(x): 0.4034    D(G(z)): 0.2278 / 0.1953
+he i <PAD> <PAD> rule ? <EOS> <PAD> <PAD> <PAD>
+
+
+[1/10][6200/6765]       Loss_D: 0.8530  Loss_G: 2.1393  D(x): 0.3839    D(G(z)): 0.1897 / 0.1391
+my forgot young young young . <EOS> <PAD> <PAD> <PAD>
+
+
+[1/10][6700/6765]       Loss_D: 0.4458  Loss_G: 1.7939  D(x): 0.4425    D(G(z)): 0.1419 / 0.1678
+he time last last last last mary . <EOS> <PAD>
+
+[2/10][450/6765]        Loss_D: 0.2563  Loss_G: 3.4499  D(x): 0.4324    D(G(z)): 0.0216 / 0.0508
+rather you you you you . <EOS> <EOS> <PAD> <PAD>
+
+
+[2/10][950/6765]        Loss_D: 0.0380  Loss_G: 3.8472  D(x): 0.4913    D(G(z)): 0.0183 / 0.0350
+i like me me me . <EOS> <PAD> <PAD> <PAD>
+
+
+[2/10][1450/6765]       Loss_D: 0.0687  Loss_G: 3.7616  D(x): 0.4823    D(G(z)): 0.0287 / 0.0256
+his his to <PAD> really . <EOS> <EOS> <PAD> <PAD>
+
+
+[2/10][1950/6765]       Loss_D: 0.6236  Loss_G: 4.1457  D(x): 0.3449    D(G(z)): 0.0518 / 0.0587
+had had lives vacation lives . <EOS> <PAD> <PAD> <PAD>
+
+
+[2/10][2450/6765]       Loss_D: 1.4581  Loss_G: 1.7943  D(x): 0.2807    D(G(z)): 0.1915 / 0.1928
+tom cats a a stayed . <EOS> <PAD> <PAD> <PAD>
+
+
+[2/10][2450/6765]       Loss_D: 1.4581  Loss_G: 1.7943  D(x): 0.2807    D(G(z)): 0.1915 / 0.1928
+tom cats a a stayed . <EOS> <PAD> <PAD> <PAD>
+
+[2/10][2950/6765]       Loss_D: 0.4975  Loss_G: 1.7132  D(x): 0.3910    D(G(z)): 0.0857 / 0.2305
+he who painted is is . <EOS> <PAD> <PAD> <PAD>
+
+
+[2/10][3450/6765]       Loss_D: 0.4640  Loss_G: 6.3138  D(x): 0.3933    D(G(z)): 0.1249 / 0.0479
+don't child caught more my . . <EOS> <PAD> <PAD>

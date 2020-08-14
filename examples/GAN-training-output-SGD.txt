@@ -1,0 +1,86 @@
+[0/10][0/6765]	Loss_D: 1.6203	Loss_G: 1.6716	D(x): 0.2540	D(G(z)): 0.2270 / 0.2125
+. where ? where long where where say long where
+
+[0/10][500/6765]	Loss_D: 1.3528	Loss_G: 1.0269	D(x): 0.3616	D(G(z)): 0.4392 / 0.3740
+<EOS> <EOS> <EOS> do is <EOS> <EOS> <EOS> <PAD> <PAD>
+
+[0/10][1000/6765]	Loss_D: 1.1115	Loss_G: 1.4015	D(x): 0.3446	D(G(z)): 0.2945 / 0.2961
+<PAD> <EOS> have they <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[0/10][1500/6765]	Loss_D: 1.1399	Loss_G: 0.9073	D(x): 0.3900	D(G(z)): 0.3758 / 0.4237
+have can have have did we have did have have
+
+[0/10][2000/6765]	Loss_D: 0.8798	Loss_G: 1.2929	D(x): 0.3446	D(G(z)): 0.2829 / 0.3253
+<PAD> tom did <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[0/10][2500/6765]	Loss_D: 0.9139	Loss_G: 1.3691	D(x): 0.3879	D(G(z)): 0.3537 / 0.2995
+your why the <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[0/10][3000/6765]	Loss_D: 1.4074	Loss_G: 0.8827	D(x): 0.2683	D(G(z)): 0.3572 / 0.4423
+. why the this this <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[0/10][3500/6765]	Loss_D: 0.8816	Loss_G: 1.2342	D(x): 0.4000	D(G(z)): 0.3688 / 0.3101
+. with . . this <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[0/10][4000/6765]	Loss_D: 0.7236	Loss_G: 0.9000	D(x): 0.4093	D(G(z)): 0.3199 / 0.4750
+. . something . this this <PAD> <EOS> <PAD> <PAD>
+
+[0/10][4500/6765]	Loss_D: 1.2244	Loss_G: 0.7361	D(x): 0.3899	D(G(z)): 0.4656 / 0.5131
+. . he <PAD> this <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[0/10][5000/6765]	Loss_D: 1.6451	Loss_G: 0.9248	D(x): 0.2896	D(G(z)): 0.4672 / 0.4313
+. out he <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[0/10][5500/6765]	Loss_D: 1.2912	Loss_G: 0.8568	D(x): 0.2942	D(G(z)): 0.3752 / 0.4396
+. out he out much <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[0/10][6000/6765]	Loss_D: 1.4651	Loss_G: 0.7789	D(x): 0.2927	D(G(z)): 0.4181 / 0.4966
+your your he out much <EOS> <EOS> <EOS> <PAD> <PAD>
+
+[0/10][6500/6765]	Loss_D: 1.5214	Loss_G: 0.7772	D(x): 0.2584	D(G(z)): 0.4896 / 0.4662
+your your he about much <EOS> <EOS> <EOS> <PAD> <PAD>
+
+[1/10][200/6765]	Loss_D: 1.3356	Loss_G: 0.9376	D(x): 0.2526	D(G(z)): 0.3912 / 0.4097
+. <EOS> about about of <EOS> <EOS> <EOS> <PAD> <PAD>
+
+[1/10][700/6765]	Loss_D: 1.8098	Loss_G: 0.6988	D(x): 0.2794	D(G(z)): 0.6205 / 0.5502
+. she about about of of <EOS> <EOS> <PAD> <PAD>
+
+[1/10][1200/6765]	Loss_D: 1.4434	Loss_G: 0.7562	D(x): 0.2739	D(G(z)): 0.4709 / 0.5213
+. she about about of of <EOS> <PAD> <PAD> <PAD>
+
+[1/10][1700/6765]	Loss_D: 1.1151	Loss_G: 1.1064	D(x): 0.2673	D(G(z)): 0.3100 / 0.4180
+. she about about of of <EOS> <PAD> <PAD> <PAD>
+
+[1/10][2200/6765]	Loss_D: 0.9943	Loss_G: 0.7676	D(x): 0.3282	D(G(z)): 0.3902 / 0.5121
+. she of about of of <PAD> <PAD> <PAD> <PAD>
+
+[1/10][2700/6765]	Loss_D: 1.1685	Loss_G: 0.7128	D(x): 0.2818	D(G(z)): 0.3569 / 0.5124
+. a of about of <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[1/10][3200/6765]	Loss_D: 1.1494	Loss_G: 0.9006	D(x): 0.2907	D(G(z)): 0.3980 / 0.4179
+. a ? a of <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[1/10][3700/6765]	Loss_D: 1.0498	Loss_G: 0.8637	D(x): 0.2733	D(G(z)): 0.2964 / 0.4443
+. a ? a of <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[1/10][4200/6765]	Loss_D: 1.0856	Loss_G: 1.5704	D(x): 0.2958	D(G(z)): 0.3525 / 0.2363
+a a a a <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[1/10][4700/6765]	Loss_D: 1.1972	Loss_G: 0.9649	D(x): 0.3167	D(G(z)): 0.4454 / 0.4227
+a a a a <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[1/10][5200/6765]	Loss_D: 1.1383	Loss_G: 0.7826	D(x): 0.2815	D(G(z)): 0.3127 / 0.4833
+a a a a <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[1/10][5700/6765]	Loss_D: 1.4869	Loss_G: 1.0038	D(x): 0.2619	D(G(z)): 0.4567 / 0.3984
+. a a a <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[1/10][6200/6765]	Loss_D: 1.3663	Loss_G: 0.9820	D(x): 0.2959	D(G(z)): 0.4286 / 0.4028
+. a he a <EOS> <EOS> <PAD> <PAD> <PAD> <PAD>
+
+[1/10][6700/6765]	Loss_D: 1.0762	Loss_G: 0.9794	D(x): 0.3373	D(G(z)): 0.4294 / 0.4404
+. a he why <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
+
+[2/10][450/6765]	Loss_D: 0.8063	Loss_G: 0.8995	D(x): 0.3487	D(G(z)): 0.3294 / 0.4373
+. a he a <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>

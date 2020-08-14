@@ -412,12 +412,83 @@ the model collapse spectacularly.
 
 \section{Analysis}\label{sec:analysis}
 
+In this section, we will present and discuss our results as well as give
+suggestions for further improvements and research.
 
 \subsection{Results}\label{sec:results}
 
+Here are some plots:
+
+\begin{figure}[h]
+    \centering
+    \begin{minipage}{0.45\textwidth}
+        \includegraphics[width=0.9\textwidth]{transformer.png}
+        \caption{%
+            Transformer.png
+        }\label{fig:transformer}
+    \end{minipage}
+    \begin{minipage}{0.45\textwidth}
+        \includegraphics[width=0.9\textwidth]{transformer_padding-eos.png}
+        \caption{%
+            Transformer with padding and EOS
+        }\label{fig:transformerPaddingEOS}
+    \end{minipage}
+
+
+\end{figure}
+
+
+This is output from a TransformerModel during training:
+
+\begin{verbatim}
+| end of epoch   5 | time: 466.09s | valid loss  3.07 | valid ppl    21.58 | train loss  2.63
+IN:  rwandan rebels are pushing their offensive south as fighting continues in the capital kigali . <EOS>
+OUT: honest guys are noticed their interesting south as fighting awake in 
+\end{verbatim}
 
 \subsection{Discussion}\label{sec:discussion}
 
+\textbf{These are notes:}
+
+The GAN network is actually able to learn.
+Sentences differ from random input.
+Increasing the batch size of $z$ might help the generator.
+The training breaks too soon
+Discriminator gets to critical
+
+`double\_batch' means that the generator is given a double sized batch for
+training.
+
+When we train the discriminator on encoded random words, $D(x)$ should be 0.5
+for a perfect $D$ (because half of $x$ is `true' and the other half is `fake').
+When omitting the encoded random words, $D(x)$ should be 1. Of course, for a
+perfect network with a perfect $D$ and a perfect $G$, both $D(x)$ and $D(G(z))$
+should be 0.5 
+
+Training without encoded random words seem to make the generator take longer to
+learn what to do with padding and EOS.\ However, it also seems to make the
+network more stable.
+
+The two output sentences in some of the GAN-training-output files are first the
+output of $G$ given the fixed noise and then the output given random noise. Not
+how they become almost identical.
+
+SGD seem to make the network more stable, but it also tends to end up with small
+sentences of identical words and a LOT of padding.
+
+Training with no encoded random words went fine for very long, with the
+generator actually being consistently better than the discriminator --- untill it
+the hit a giant collapse (see
+\texttt{../examples/GAN-training-output-double\_batch-Adam-no\_random.txt}
+and~\ref{fig:doubleBatchAdamNoRandom} for evidence)
+
+\begin{figure}[h]
+    \captionsetup{width=\textwidth}
+    \includegraphics[width=\textwidth,height=12cm]{GAN-loss-double_batch-Adam-no_random.png}
+    \caption{%
+        GAN loss for setup with Adam, double batch and no encoded random words.
+    }\label{fig:doubleBatchAdamNoRandom}
+\end{figure}
 
 \section{Further research}\label{sec:furtherResearch}
 

@@ -17,7 +17,7 @@ from pathlib import Path
 
 
 def run(padding_eos):
-    dm = DataManager(normalize_to_max_seq_len_and_eos=padding_eos)
+    dm = DataManager(normalize_to_max_seq_len_and_eos=False, eos=True)
     train_d, test_d, dev_d = dm.get_batched_data(batch_sz=8)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -249,7 +249,6 @@ def run(padding_eos):
     # print(model.state_dict())
 
     return model
-
 
 if __name__ == '__main__':
     if sys.argv[1] == "True":

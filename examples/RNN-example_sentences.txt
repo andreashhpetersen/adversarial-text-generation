@@ -1,0 +1,29 @@
+> tom got to the station too late so he missed the train . <EOS> <PAD>
+< tom got to the so so so he opened the same . <EOS>
+
+> i don't want to waste my time trying to do this again . <EOS> <PAD>
+< i don't want to take my job to do me it . <EOS>
+
+> if the car is gone , he can't be at the office . <EOS> <PAD>
+< if the book is he , he was late than the . <EOS>
+
+> i started to learn english with the aim of becoming a teacher . <EOS> <PAD>
+< i tried to go of a from the of of a . <EOS>
+
+> tom is the only one in our family who doesn't like singing . <EOS> <PAD>
+< tom is the one one of time that i saw you . <EOS>
+
+> management hid the true financial state of the company from the workers . <EOS> <PAD>
+< japan matter the the most the the the of of the . . <EOS>
+
+> i caught a glimpse of him as he turned the corner . <EOS> <PAD> <PAD>
+< i felt a lot of him when he into the . <EOS>
+
+> the nozomi is the fastest of all the trains in japan . <EOS> <PAD> <PAD>
+< the boy is the the of the most is in . . <EOS>
+
+> you have to get this work finished by noon . <EOS> <PAD> <PAD> <PAD> <PAD>
+< you have to get a work was on . <EOS>
+
+> i can't believe that you were the smartest kid in your class . <EOS> <PAD>
+< i can't believe that you were a a the in the . . <EOS>
