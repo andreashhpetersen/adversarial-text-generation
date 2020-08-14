@@ -498,6 +498,23 @@ Test examples:
 \end{verbatim}
 
 \subsubsection{GAN}
+
+\begin{figure}[h]
+    \centering
+    \begin{minipage}{0.45\textwidth}
+        \includegraphics[width=0.9\textwidth]{gan.png}
+        \caption{%
+            Loss of the GAN using the standard TransformerModel
+        }\label{fig:gan}
+    \end{minipage}
+    \begin{minipage}{0.45\textwidth}
+        \includegraphics[width=0.9\textwidth]{GAN-loss-double_batch-Adam-no_random.png}
+        \caption{%
+            Loss of the GAN using the TransformerModel that takes padding into account and has EOS tokens
+        }\label{fig:ganPaddingEOS}
+    \end{minipage}
+\end{figure}
+
 Output of the model with the highest $D(G(z))$ while still having a $D(x) > 0.35$:
 \scriptsize
 \begin{verbatim}
@@ -576,7 +593,16 @@ and~\ref{fig:doubleBatchAdamNoRandom} for evidence)
 \end{figure}
 
 \section{Further research}\label{sec:furtherResearch}
+There are two primary areas of interest.
 
+We believe that the full potential of using the TransformerModel encodings
+in a GAN has yet to be revealed. Training a GAN without batching using a variable
+input length with EOS tokens, could lead to further improvements. Another approach
+to explore is using the original transformer stack in place of two encoder stacks.
+
+Furthermore using a fixed size encoding such as the RnnModel makes training the encoder much harder
+but should make training the GAN much easier. As such getting a good Teacher model using this
+approach could potentially lead to large improvements in the GAN model.
 
 \section{Conclusion}\label{sec:conclusion}
 
