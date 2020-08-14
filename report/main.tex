@@ -455,12 +455,33 @@ OUT: honest guys are noticed their interesting south as fighting awake in
 
 \subsection{Discussion}\label{sec:discussion}
 
+\textbf{These are notes:}
+
 The GAN network is actually able to learn.
 Sentences differ from random input.
 Increasing the batch size of $z$ might help the generator.
-Examples of D(x) being 0.25 and D(G(z)) being 0.5 / 0.5
 The training breaks too soon
 Discriminator gets to critical
+
+`double\_batch' means that the generator is given a double sized batch for
+training.
+
+When we train the discriminator on encoded random words, $D(x)$ should be 0.5
+for a perfect $D$ (because half of $x$ is `true' and the other half is `fake').
+When omitting the encoded random words, $D(x)$ should be 1. Of course, for a
+perfect network with a perfect $D$ and a perfect $G$, both $D(x)$ and $D(G(z))$
+should be 0.5 
+
+Training without encoded random words seem to make the generator take longer to
+learn what to do with padding and EOS.\ However, it also seems to make the
+network more stable.
+
+The two output sentences in some of the GAN-training-output files are first the
+output of $G$ given the fixed noise and then the output given random noise. Not
+how they become almost identical.
+
+SGD seem to make the network more stable, but it also tends to end up with small
+sentences of identical words and a LOT of padding.
 
 \section{Further research}\label{sec:furtherResearch}
 
