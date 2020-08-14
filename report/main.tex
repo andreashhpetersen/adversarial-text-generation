@@ -325,7 +325,7 @@ Our training had two aspects: first, we had to train our autoencoders on
 English-to-English sentence pairs, and then we had to train our GAN model. This
 section will describe both.
 
-\subsubsection{Training the autoencoders}
+\subsubsection{Training the autoencoders}\label{sec:trainingAutoEnc}
 
 This part is pretty straight forward. We give the model a batch of sentences
 which it then encodes and decodes again. Since the input sentence is also the
@@ -362,7 +362,7 @@ training instance, we chose with 50\% probability wether to use teacher forcing
 or not.
 
 
-\subsubsection{Training the GAN model}
+\subsubsection{Training the GAN model}\label{sec:trainingGAN}
 
 The training of the GAN model is the interesting and difficult process. Here, we
 have to simultaneously train two different models that work towards opposite
@@ -424,9 +424,10 @@ the model collapse spectacularly.
 In this section, we will present and discuss our results as well as give
 suggestions for further improvements and research.
 
-\subsection{Results}\label{sec:results}
+\subsection{Results and discussion}\label{sec:results}
 
 \subsubsection{TransformerModel}
+
 As stated, we trained the TransformerModel both with and without ignoring
 padding. Generally, we achieved nice results here, with a word accuracy around
 99\%. In Figure~\ref{fig:transformerLossNoPadding}
@@ -451,15 +452,6 @@ and~\ref{fig:transformerLossPaddingEOS} we have plotted the loss.
     \end{minipage}
 \end{figure}
 
-
-%This is output from a TransformerModel during training:
-%
-%\begin{verbatim}
-%| end of epoch   5 | time: 466.09s | valid loss  3.07 | valid ppl    21.58 | train loss  2.63
-%IN:  rwandan rebels are pushing their offensive south as fighting continues
-%     in the capital kigali . <EOS>
-%OUT: honest guys are noticed their interesting south as fighting awake in
-%\end{verbatim}
 
 The following are some examples of how the model performed on specific inputs:
 
@@ -626,12 +618,19 @@ don't child caught more my . . <EOS> <PAD> <PAD>
 
 These are outputs that show, what the loss of the discriminator (Loss\_D), the
 loss of the generator (Loss\_G), the average discriminator output on
-non-generated data (D(x)) and the average discriminator output on the
-generated data before and after updating the discriminator (D(G(z))). We see
-that the model learns the structure of \texttt{end-of-sequence}-tokens, padding
-and to some extent punctuation. The sentences are clearly nonsense, but they
-do not seem totally random. Compare the later outputs with the first and these
-points are more clear.
+non-generated data ($D(x)$) and the average discriminator output on the
+generated data before and after updating the discriminator ($D(G(z))$).
+
+When we train the discriminator on encoded random words, $D(x)$ should be 0.5
+for a perfect $D$ (because half of $x$ is `true' and the other half is `fake').
+When omitting the encoded random words, $D(x)$ should be 1. Of course, for a
+perfect network with a perfect $D$ and a perfect $G$, both $D(x)$ and $D(G(z))$
+should be 0.5.
+
+We seethat the model learns the structure of \texttt{end-of-sequence}-tokens,
+padding and to some extent punctuation. The sentences are clearly nonsense, but
+they do not seem totally random. Compare the later outputs with the first and
+these points are more clear.
 
 We also notice, that $D(G(z))$ become very low towards the end here. This means
 that the discriminator correctly classifies nearly all the generated sentences. 
@@ -643,6 +642,7 @@ Now lets look at the output for the SGD training:
 . where ? where long where where say long where
 
 [0/10][500/6765]    Loss_D: 1.3528    Loss_G: 1.0269    D(x): 0.3616    D(G(z)): 0.4392 / 0.3740
+<EOS> <EOS> <EOS> do is <EOS> <EOS> <EOS> <PAD> <PAD>
 
 [0/10][3000/6765]    Loss_D: 1.4074    Loss_G: 0.8827    D(x): 0.2683    D(G(z)): 0.3572 / 0.4423
 . why the this this <PAD> <PAD> <PAD> <PAD> <PAD>
@@ -657,102 +657,176 @@ Now lets look at the output for the SGD training:
 
 [2/10][450/6765]    Loss_D: 0.8063    Loss_G: 0.8995    D(x): 0.3487    D(G(z)): 0.3294 / 0.4373
 . a he a <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
-<EOS> <EOS> <EOS> do is <EOS> <EOS> <EOS> <PAD> <PAD>
-
-
 \end{verbatim}
+
+Though we don't see the collapse in the generator, the output sentences are much
+worse from a human perspective. It does put padding and
+\texttt{end-of-sequence}-tokens in their right place, but is uses too many and
+it doesn't seem to get punctuation. Also, it converges towards a smaller and
+smaller sentence with a still more limited vocabulary.
+
+Next up, we have some examples of output when training with Adam and double
+batch for the generator. This time, the first output sentence is based on some
+fixed noise initialised before training, and the second sentence comes from
+random noise generated at each print:
+
+\begin{verbatim}
+[0/10][0/6765]    Loss_D: 1.6505    Loss_G: 0.5963    D(x): 0.5498    D(G(z)): 0.5673 / 0.5897
+. . . . <EOS> . . . common likes
+became <EOS> <EOS> <EOS> . <EOS> . . . .
+
+[0/10][500/6765]    Loss_D: 1.6686    Loss_G: 0.6725    D(x): 0.2467    D(G(z)): 0.5252 / 0.5183
+? ? <PAD> <PAD> about something <EOS> <PAD> <PAD> <PAD>
+? ? <PAD> of about martial make <PAD> <PAD> <PAD>
+
+[0/10][3000/6765]    Loss_D: 1.4506    Loss_G: 0.7180    D(x): 0.2317    D(G(z)): 0.4720 / 0.4948
+? ? apartment thing he <EOS> <EOS> <EOS> <PAD> <PAD>
+? my apartment thing but <EOS> <EOS> <PAD> <PAD> <PAD>
+
+...
+
+[2/10][6450/6765]    Loss_D: 0.9028    Loss_G: 1.7122    D(x): 0.3388    D(G(z)): 0.1354 / 0.1937
+into i've me him allow . <EOS> <PAD> <PAD> <PAD>
+into i've necessary him allow . <EOS> <PAD> <PAD> <PAD>
+
+[3/10][200/6765]    Loss_D: 0.5534    Loss_G: 4.4299    D(x): 0.4601    D(G(z)): 0.1967 / 0.0788
+days days still going going . . <EOS> <EOS> <PAD>
+days was still my going . . <EOS> <EOS> <EOS>
+
+[3/10][700/6765]    Loss_D: 0.7864    Loss_G: 1.9832    D(x): 0.3432    D(G(z)): 0.0988 / 0.1549
+smoking his get his need careful . <EOS> <PAD> <PAD>
+smoking a get get probably careful . <EOS> <PAD> <PAD>
+\end{verbatim}
+
+Here we also observe a generator that looses to the discriminator, but the
+output sentences are not that bad. Interestingly though, both the fixed and the
+random noise produces almost similar results after the first output which may
+indicate that the model tries to find \textit{one} correct sentence to give to
+the discriminator.
+
+For good measure, we also tried to see what happened if we didn't train the
+discriminator on random encoded words (as described in
+Section~\ref{sec:trainingGAN}). As can be seen in
+Figure~\ref{fig:ganLossAdamNoRandom} this let to a model that for long was much
+more stable than the previous ones and with a generator having a lower loss than
+the discriminator. However, at a certain point, the model basically explodes and
+the training completely breaks.
 
 \begin{figure}[ht]
     \centering
     \captionsetup{width=0.7\textwidth}
     \includegraphics[width=0.9\textwidth, height=10cm]{GAN-loss-double_batch-Adam-no_random.png}
     \caption{%
-        Loss of the GAN using the TransformerModel that takes padding into
-        account and has EOS tokens
-    }\label{fig:ganPaddingEOS}
+        Loss of the GAN with double batching for the generator and no encoded
+        random words for the discriminator.
+    }\label{fig:ganLossAdamNoRandom}
 \end{figure}
 
+Here are some outputs of that model:
 
-
-
-
-
-Output of the model with the highest $D(G(z))$ while still having a $D(x) > 0.35$:
-\scriptsize
 \begin{verbatim}
-one wish a hot next suspicious suspicious suspicious suspicious suspicious suspicious suspicious suspicious suspicious subtitled
-one wish a quite next suspicious suspicious suspicious suspicious suspicious suspicious suspicious suspicious suspicious subtitled
-one wish to hot next suspicious suspicious suspicious suspicious suspicious suspicious suspicious suspicious suspicious subtitled
-one wish to hot states suspicious suspicious suspicious suspicious suspicious suspicious suspicious suspicious suspicious subtitled
-\end{verbatim}
-\normalsize
+[0/10][0/6765]    Loss_D: 1.9186    Loss_G: 0.6208    D(x): 0.4685    D(G(z)): 0.5844 / 0.5884
+shorter anything anything out go again out mary out prefer
+machine shopping fish it's shopping prefer mistakes mistakes everything clear
 
-Output of the model at the end of training:
-\footnotesize
+[0/10][500/6765]    Loss_D: 1.4489    Loss_G: 0.7317    D(x): 0.5092    D(G(z)): 0.5200 / 0.4889
+. ? of <PAD> <PAD> of of way she <PAD>
+. ? of <PAD> <PAD> of of english she <PAD>
+
+[0/10][1000/6765]    Loss_D: 1.5700    Loss_G: 0.6301    D(x): 0.4740    D(G(z)): 0.5423 / 0.5395
+<PAD> untidy of <PAD> <PAD> <PAD> of way she <PAD>
+<PAD> make of <PAD> <PAD> poor of way his <PAD>
+
+...
+
+[1/10][5200/6765]    Loss_D: 1.4087    Loss_G: 0.7026    D(x): 0.5035    D(G(z)): 0.5127 / 0.4960
+<PAD> appropriated she she she <EOS> <EOS> <EOS> <PAD> <PAD>
+<PAD> appropriated she she she <EOS> <EOS> <EOS> <EOS> <PAD>
+
+[1/10][5700/6765]    Loss_D: 1.4143    Loss_G: 0.7011    D(x): 0.4879    D(G(z)): 0.5002 / 0.4968
+worms <EOS> <PAD> ? why <PAD> <EOS> <EOS> <PAD> <PAD>
+worms <EOS> worms <PAD> something <PAD> <PAD> <EOS> <PAD> <PAD>
+
+[1/10][6200/6765]    Loss_D: 1.3873    Loss_G: 0.6957    D(x): 0.5044    D(G(z)): 0.5023 / 0.4997
+? <EOS> do <PAD> you'll thing <EOS> <EOS> <PAD> <PAD>
+? <EOS> do <PAD> of thing <EOS> <EOS> <EOS> <PAD>
+
+\end{verbatim}
+
+Here we seem to see that model has much harder time constructing actual
+sentences. It puts \texttt{end-of-sequence}-tokens and padding at random places
+and it hasn't really picked up on punctuation yet. But we are not yet at the
+collapse seen in Figure~\ref{fig:ganLossAdamNoRandom}, so lets take a look at
+some more outputs:
+
 \begin{verbatim}
-he lazy lazy married married . cholesterol suspicious subtitled suspicious mercury mercury mercury mercury scientist
-he a doesn't married married . suspicious suspicious suspicious suspicious mercury mercury mercury mercury scientist
-he lazy lazy married married . suspicious subtitled suspicious suspicious mercury mercury mercury scientist scientist
-he america lazy married married . cholesterol suspicious suspicious mercury mercury mercury mercury scientist scientist
-\end{verbatim}
-\normalsize
+[2/10][1950/6765]    Loss_D: 1.3705    Loss_G: 0.7144    D(x): 0.5072    D(G(z)): 0.4975 / 0.4904
+get appropriated of is <EOS> <EOS> <EOS> delayed <PAD> <PAD>
+get appropriated of is <EOS> <EOS> <EOS> a <PAD> <PAD>
 
-As can be seen the model tends be rather static in its output, as such here are some sentences generated by the model while training:
-\footnotesize
+[2/10][2450/6765]    Loss_D: 1.3432    Loss_G: 0.6959    D(x): 0.5086    D(G(z)): 0.4853 / 0.4991
+that criticisms of to that <EOS> <EOS> <EOS> <PAD> <PAD>
+that criticisms of him <EOS> <EOS> <EOS> <EOS> <EOS> <PAD>
+
+[2/10][2950/6765]    Loss_D: 1.4055    Loss_G: 0.6989    D(x): 0.4902    D(G(z)): 0.4984 / 0.4975
+is much not to <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
+is my not <EOS> <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
+
+...
+
+[3/10][200/6765]    Loss_D: 1.3366    Loss_G: 0.7089    D(x): 0.5265    D(G(z)): 0.4985 / 0.4929
+. . . . <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
+. . . . <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
+
+[3/10][700/6765]    Loss_D: 0.0100    Loss_G: 5.0729    D(x): 0.9973    D(G(z)): 0.0073 / 0.0072
+<PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+<PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[3/10][2700/6765]    Loss_D: 0.0017    Loss_G: 6.7365    D(x): 0.9996    D(G(z)): 0.0013 / 0.0013
+make make make make make make make make make make
+make make make make make make make make make make
+
+\end{verbatim}
+
+Here it seems that the model was beginning to pick up on where to put
+\texttt{end-of-sequence}-tokens and padding (though not to what extent) but when
+the collapse happens, the generator completely stops working and just outputs
+single-word sentences. The collapse is also clearly represented in both $D(x)$
+and $D(G(z))$.
+
+Finally, for comparison, lets look at some examples of the GAN model, when it is
+trained on a TransformerModel that hasn't learned about padding and
+\texttt{end-of-sequence}-tokens:
+
 \begin{verbatim}
-are thank new to you . suspicious suspicious suspicious prevents suspicious mafia mafia mafia subtitled
-something troll me watched watched . suspicious suspicious suspicious suspicious mafia mafia mafia mafia mafia
-your ignored delayed delayed . helpless helpless helpless helpless helpless helpless suspicious helpless helpless helpless
-it's , , him looking expect . . housewarming housewarming housewarming suspicious mercury mercury mercury
-for change but do i . suspicious suspicious suspicious suspicious suspicious suspicious suspicious mafia mafia
-i mohammed convenience play the . suspicious suspicious suspicious suspicious suspicious mafia mafia mafia mafia
-he used was donated money . subtitled suspicious suspicious suspicious suspicious suspicious suspicious scientist scientist
+are thank new to you . suspicious suspicious suspicious prevents suspicious
+mafia mafia mafia subtitled
+
+something troll me watched watched . suspicious suspicious suspicious suspicious
+mafia mafia mafia mafia mafia
+
+your ignored delayed delayed . helpless helpless helpless helpless helpless
+helpless suspicious helpless helpless helpless
+
+it's , , him looking expect . . housewarming housewarming housewarming
+suspicious mercury mercury mercury
+
+for change but do i . suspicious suspicious suspicious suspicious suspicious
+suspicious suspicious mafia mafia
+
+i mohammed convenience play the . suspicious suspicious suspicious suspicious
+suspicious mafia mafia mafia mafia
+
+he used was donated money . subtitled suspicious suspicious suspicious
+suspicious suspicious suspicious scientist scientist
 \end{verbatim}
-\normalsize
 
-\subsection{Discussion}\label{sec:discussion}
+It is interesting note, that it seems to attempt generating a sentence with
+different word and some kinds of sentence constructs, but after it outputs a
+punctuation mark it almost just outputs the same word over and over. This
+indicates that is has learned the concept of sentence length and some
+consequence of an end of sequence marker (such as the punctuation mark).
 
-\textbf{These are notes:}
-
-The GAN network is actually able to learn.
-Sentences differ from random input.
-Increasing the batch size of $z$ might help the generator.
-The training breaks too soon
-Discriminator gets to critical
-
-`double\_batch' means that the generator is given a double sized batch for
-training.
-
-When we train the discriminator on encoded random words, $D(x)$ should be 0.5
-for a perfect $D$ (because half of $x$ is `true' and the other half is `fake').
-When omitting the encoded random words, $D(x)$ should be 1. Of course, for a
-perfect network with a perfect $D$ and a perfect $G$, both $D(x)$ and $D(G(z))$
-should be 0.5 
-
-Training without encoded random words seem to make the generator take longer to
-learn what to do with padding and EOS.\ However, it also seems to make the
-network more stable.
-
-The two output sentences in some of the GAN-training-output files are first the
-output of $G$ given the fixed noise and then the output given random noise. Not
-how they become almost identical.
-
-SGD seem to make the network more stable, but it also tends to end up with small
-sentences of identical words and a LOT of padding.
-
-Training with no encoded random words went fine for very long, with the
-generator actually being consistently better than the discriminator --- until it
-the hit a giant collapse (see
-\texttt{../examples/GAN-training-output-double\_batch-Adam-no\_random.txt}
-and~\ref{fig:doubleBatchAdamNoRandom} for evidence)
-
-%\begin{figure}[h]
-%    \captionsetup{width=\textwidth}
-%    \includegraphics[width=\textwidth,height=12cm]{GAN-loss-double_batch-Adam-no_random.png}
-%    \caption{%
-%        GAN loss for setup with Adam, double batch and no encoded random words.
-%    }\label{fig:doubleBatchAdamNoRandom}
-%\end{figure}
 
 \section{Further research}\label{sec:furtherResearch}
 There are two primary areas of interest.

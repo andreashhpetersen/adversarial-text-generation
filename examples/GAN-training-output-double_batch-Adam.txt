@@ -1,147 +1,197 @@
 [0/10][0/6765]	Loss_D: 1.6505	Loss_G: 0.5963	D(x): 0.5498	D(G(z)): 0.5673 / 0.5897
 . . . . <EOS> . . . common likes
 became <EOS> <EOS> <EOS> . <EOS> . . . .
+
 [0/10][500/6765]	Loss_D: 1.6686	Loss_G: 0.6725	D(x): 0.2467	D(G(z)): 0.5252 / 0.5183
 ? ? <PAD> <PAD> about something <EOS> <PAD> <PAD> <PAD>
 ? ? <PAD> of about martial make <PAD> <PAD> <PAD>
+
 [0/10][1000/6765]	Loss_D: 1.5781	Loss_G: 0.6814	D(x): 0.2283	D(G(z)): 0.5247 / 0.5145
 ? worms make <PAD> something martial <EOS> <PAD> <PAD> <PAD>
 ? breath make he something beat <EOS> <PAD> <PAD> <PAD>
+
 [0/10][1500/6765]	Loss_D: 1.4364	Loss_G: 0.7226	D(x): 0.2692	D(G(z)): 0.5317 / 0.4986
 my him him him him him <PAD> <PAD> <PAD> <PAD>
 make him him him him <EOS> <PAD> <PAD> <PAD> <PAD>
+
 [0/10][2000/6765]	Loss_D: 1.4644	Loss_G: 0.6673	D(x): 0.2560	D(G(z)): 0.5260 / 0.5217
 <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
 <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+
 [0/10][2500/6765]	Loss_D: 1.2459	Loss_G: 0.7434	D(x): 0.2830	D(G(z)): 0.4726 / 0.4835
 my my went ? ? ? <PAD> <PAD> <PAD> <PAD>
 my my went ? ? beat <PAD> <PAD> <PAD> <PAD>
+
 [0/10][3000/6765]	Loss_D: 1.4506	Loss_G: 0.7180	D(x): 0.2317	D(G(z)): 0.4720 / 0.4948
 ? ? apartment thing he <EOS> <EOS> <EOS> <PAD> <PAD>
 ? my apartment thing but <EOS> <EOS> <PAD> <PAD> <PAD>
+
 [0/10][3500/6765]	Loss_D: 1.3301	Loss_G: 1.2290	D(x): 0.2385	D(G(z)): 0.3944 / 0.3030
 cute cute <PAD> . . . <EOS> <EOS> <PAD> <PAD>
 cute cute <PAD> she she she <EOS> <EOS> <PAD> <PAD>
+
 [0/10][4000/6765]	Loss_D: 0.9331	Loss_G: 1.5359	D(x): 0.3647	D(G(z)): 0.2557 / 0.2348
 not noh do do do <EOS> . <EOS> <PAD> <PAD>
 not competitors do do do <EOS> . <EOS> <PAD> <PAD>
+
 [0/10][4500/6765]	Loss_D: 0.2195	Loss_G: 1.8959	D(x): 0.4957	D(G(z)): 0.1848 / 0.1650
 not not <PAD> me me look me . <EOS> <PAD>
 not not <PAD> me me look look . <EOS> <PAD>
+
 [0/10][5000/6765]	Loss_D: 0.3784	Loss_G: 1.6983	D(x): 0.4579	D(G(z)): 0.2111 / 0.1962
 it change something something something of . <EOS> <PAD> <PAD>
 it than something something something <EOS> . <EOS> <PAD> <PAD>
+
 [0/10][5500/6765]	Loss_D: 0.8837	Loss_G: 1.7329	D(x): 0.3315	D(G(z)): 0.1921 / 0.1938
 i she first first <PAD> . <EOS> <PAD> <PAD> <PAD>
 i she first first <PAD> . <EOS> <PAD> <PAD> <PAD>
+
 [0/10][6000/6765]	Loss_D: 0.5083	Loss_G: 1.5988	D(x): 0.4421	D(G(z)): 0.2026 / 0.2156
 two rain of <PAD> rather . <EOS> <PAD> <PAD> <PAD>
 everything rain of <PAD> rather . <EOS> <PAD> <PAD> <PAD>
+
 [0/10][6500/6765]	Loss_D: 0.2094	Loss_G: 1.8323	D(x): 0.4941	D(G(z)): 0.1770 / 0.1668
 your your again again again again ? . <EOS> <PAD>
 your your again again again ? ? . <EOS> <PAD>
+
 [1/10][200/6765]	Loss_D: 0.5028	Loss_G: 4.5448	D(x): 0.4118	D(G(z)): 0.1944 / 0.1448
 i i good . <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
 i i can . <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
+
 [1/10][700/6765]	Loss_D: 0.5088	Loss_G: 2.0165	D(x): 0.3834	D(G(z)): 0.1518 / 0.1824
 i i waiting waiting house <PAD> . <EOS> <PAD> <PAD>
 i i waiting house house <PAD> . <EOS> <PAD> <PAD>
+
 [1/10][1200/6765]	Loss_D: 0.5811	Loss_G: 1.7760	D(x): 0.4051	D(G(z)): 0.1506 / 0.1974
 ? luck your your went meet . <EOS> <PAD> <PAD>
 i green your i i meet . <EOS> <PAD> <PAD>
+
 [1/10][1700/6765]	Loss_D: 0.7194	Loss_G: 1.7172	D(x): 0.3681	D(G(z)): 0.2166 / 0.2104
 he he everything everything haven't next . <EOS> <PAD> <PAD>
 a he everything everything turn next . <EOS> <PAD> <PAD>
+
 [1/10][2200/6765]	Loss_D: 0.7215	Loss_G: 1.8952	D(x): 0.3918	D(G(z)): 0.1459 / 0.2094
 the they they they house house . <EOS> <PAD> <PAD>
 the put first they they is . <EOS> <PAD> <PAD>
+
 [1/10][2700/6765]	Loss_D: 1.9068	Loss_G: 1.1895	D(x): 0.4910	D(G(z)): 0.6815 / 0.6450
 i rest what the what reason . <EOS> <EOS> <PAD>
 i rest the the what reason . <EOS> <EOS> <PAD>
+
 [1/10][3200/6765]	Loss_D: 0.4706	Loss_G: 1.9545	D(x): 0.4406	D(G(z)): 0.1225 / 0.1521
 felt shopping to to . strength needs . <EOS> <PAD>
 felt shopping to to has strength needs . <EOS> <PAD>
+
 [1/10][3700/6765]	Loss_D: 0.2038	Loss_G: 2.9590	D(x): 0.4956	D(G(z)): 0.1595 / 0.0623
 he on tom car <PAD> . <EOS> <PAD> <PAD> <PAD>
 he on tom piece <PAD> . <EOS> <PAD> <PAD> <PAD>
+
 [1/10][4200/6765]	Loss_D: 0.5129	Loss_G: 2.0424	D(x): 0.4407	D(G(z)): 0.1401 / 0.1817
 she they they words <PAD> . <EOS> <PAD> <PAD> <PAD>
 she they they words <PAD> . <EOS> <PAD> <PAD> <PAD>
+
 [1/10][4700/6765]	Loss_D: 0.3477	Loss_G: 2.1635	D(x): 0.4475	D(G(z)): 0.1953 / 0.1453
 i mail a a sit ? . <PAD> <PAD> <PAD>
 i gun to to to ? . <PAD> <PAD> <PAD>
+
 [1/10][5200/6765]	Loss_D: 0.1598	Loss_G: 2.9406	D(x): 0.4516	D(G(z)): 0.0428 / 0.0719
 the tom a be . <EOS> <EOS> <PAD> <PAD> <PAD>
 the tom a be . <EOS> <EOS> <PAD> <PAD> <PAD>
+
 [1/10][5700/6765]	Loss_D: 0.1483	Loss_G: 2.0115	D(x): 0.4973	D(G(z)): 0.1304 / 0.1719
 i <PAD> we on . <EOS> <PAD> <PAD> <PAD> <PAD>
 i <PAD> we on . <EOS> <PAD> <PAD> <PAD> <PAD>
+
 [1/10][6200/6765]	Loss_D: 0.2739	Loss_G: 1.8140	D(x): 0.4637	D(G(z)): 0.1503 / 0.1797
 read is a spend . <EOS> <PAD> <PAD> <PAD> <PAD>
 read is is spend . <EOS> <PAD> <PAD> <PAD> <PAD>
+
 [1/10][6700/6765]	Loss_D: 0.1799	Loss_G: 2.5305	D(x): 0.4790	D(G(z)): 0.1169 / 0.0977
 i keep now for looking . <PAD> <PAD> <PAD> <PAD>
 i there's now for looking . <PAD> <PAD> <PAD> <PAD>
+
 [2/10][450/6765]	Loss_D: 0.5002	Loss_G: 5.5032	D(x): 0.4711	D(G(z)): 0.2143 / 0.0798
 is is buy . <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
 is is bag . <EOS> <EOS> <PAD> <PAD> <PAD> <PAD>
+
 [2/10][950/6765]	Loss_D: 0.8760	Loss_G: 1.5126	D(x): 0.3250	D(G(z)): 0.2489 / 0.2442
 i she use use use . <EOS> <PAD> <PAD> <PAD>
 i she use play use . <EOS> <PAD> <PAD> <PAD>
+
 [2/10][1450/6765]	Loss_D: 0.5762	Loss_G: 2.1314	D(x): 0.3971	D(G(z)): 0.1276 / 0.1443
 tall tall it's we . . <EOS> <PAD> <PAD> <PAD>
 tall tall it's two comfortable . <EOS> <PAD> <PAD> <PAD>
+
 [2/10][1950/6765]	Loss_D: 0.9216	Loss_G: 1.5843	D(x): 0.3374	D(G(z)): 0.1476 / 0.2177
 i laughed tom comfortable damage . <EOS> <PAD> <PAD> <PAD>
 i laughed tom on damage . <EOS> <PAD> <PAD> <PAD>
+
 [2/10][2450/6765]	Loss_D: 0.2181	Loss_G: 5.7517	D(x): 0.4177	D(G(z)): 0.0117 / 0.0265
 . my outside looks talking party <EOS> <PAD> <PAD> <PAD>
 . my outside looks talking anyone <EOS> <PAD> <PAD> <PAD>
+
 [2/10][2950/6765]	Loss_D: 0.5490	Loss_G: 1.8789	D(x): 0.4071	D(G(z)): 0.1751 / 0.1683
 do could he all house . <EOS> <PAD> <PAD> <PAD>
 do could he all house . <EOS> <PAD> <PAD> <PAD>
+
 [2/10][3450/6765]	Loss_D: 1.0308	Loss_G: 1.9671	D(x): 0.3276	D(G(z)): 0.1532 / 0.1477
 tom is is boy bicycle . <EOS> <PAD> <PAD> <PAD>
 tom is is home home . <EOS> <PAD> <PAD> <PAD>
+
 [2/10][3950/6765]	Loss_D: 0.4359	Loss_G: 1.9964	D(x): 0.4443	D(G(z)): 0.1505 / 0.1455
 i end <PAD> her such . <EOS> <PAD> <PAD> <PAD>
 i end <PAD> her such . <EOS> <PAD> <PAD> <PAD>
+
 [2/10][4450/6765]	Loss_D: 0.5362	Loss_G: 1.5441	D(x): 0.4434	D(G(z)): 0.2113 / 0.2215
 he say a are together . <EOS> <PAD> <PAD> <PAD>
 he meeting a me together . <EOS> <PAD> <PAD> <PAD>
+
 [2/10][4950/6765]	Loss_D: 0.7270	Loss_G: 1.3075	D(x): 0.3735	D(G(z)): 0.2561 / 0.2766
 he trying you up stop . <EOS> <PAD> <PAD> <PAD>
 he trying you up stop . <EOS> <PAD> <PAD> <PAD>
+
 [2/10][5450/6765]	Loss_D: 0.7105	Loss_G: 1.7820	D(x): 0.3981	D(G(z)): 0.2443 / 0.1827
 the going afraid theory moon . <EOS> <PAD> <PAD> <PAD>
 the going afraid theory moon . <EOS> <PAD> <PAD> <PAD>
+
 [2/10][5950/6765]	Loss_D: 0.3640	Loss_G: 2.0442	D(x): 0.4411	D(G(z)): 0.1467 / 0.1336
 i by by by more . <EOS> <PAD> <PAD> <PAD>
 i by by by more . <EOS> <PAD> <PAD> <PAD>
+
 [2/10][6450/6765]	Loss_D: 0.9028	Loss_G: 1.7122	D(x): 0.3388	D(G(z)): 0.1354 / 0.1937
 into i've me him allow . <EOS> <PAD> <PAD> <PAD>
 into i've necessary him allow . <EOS> <PAD> <PAD> <PAD>
+
 [3/10][200/6765]	Loss_D: 0.5534	Loss_G: 4.4299	D(x): 0.4601	D(G(z)): 0.1967 / 0.0788
 days days still going going . . <EOS> <EOS> <PAD>
 days was still my going . . <EOS> <EOS> <EOS>
+
 [3/10][700/6765]	Loss_D: 0.7864	Loss_G: 1.9832	D(x): 0.3432	D(G(z)): 0.0988 / 0.1549
 smoking his get his need careful . <EOS> <PAD> <PAD>
 smoking a get get probably careful . <EOS> <PAD> <PAD>
+
 [3/10][1200/6765]	Loss_D: 0.2828	Loss_G: 3.1398	D(x): 0.4777	D(G(z)): 0.1994 / 0.1433
 the london why why why why large . <EOS> <PAD>
 the london why why why need large . <EOS> <PAD>
+
 [3/10][1700/6765]	Loss_D: 0.2832	Loss_G: 5.1452	D(x): 0.4808	D(G(z)): 0.1274 / 0.0218
 i . <EOS> doesn't world world doing . <PAD> <PAD>
 i . <EOS> say world world doing . <PAD> <PAD>
+
 [3/10][2200/6765]	Loss_D: 0.8897	Loss_G: 3.2034	D(x): 0.3049	D(G(z)): 0.0485 / 0.1496
 i tom join strong times times . <EOS> <EOS> <PAD>
 i tom the strong times times . <EOS> <PAD> <PAD>
+
 [3/10][2700/6765]	Loss_D: 0.8184	Loss_G: 1.7361	D(x): 0.3635	D(G(z)): 0.2569 / 0.1932
 . office alone alone alone walk . <EOS> <PAD> <PAD>
 . strong alone alone alone walk . <EOS> <PAD> <PAD>
+
 [3/10][3200/6765]	Loss_D: 0.6460	Loss_G: 1.7736	D(x): 0.3854	D(G(z)): 0.1281 / 0.1873
 i a <PAD> she she . <EOS> <PAD> <PAD> <PAD>
 i a <PAD> she she . <EOS> <PAD> <PAD> <PAD>
+
 [3/10][3700/6765]	Loss_D: 0.9888	Loss_G: 2.5511	D(x): 0.3119	D(G(z)): 0.2183 / 0.2037
 she talk i i i . <EOS> <PAD> <PAD> <PAD>
 she talk i i i . <EOS> <PAD> <PAD> <PAD>
+
+
