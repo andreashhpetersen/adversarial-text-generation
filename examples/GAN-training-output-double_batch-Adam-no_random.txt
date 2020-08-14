@@ -1,0 +1,24 @@
+[0/10][0/6765]	Loss_D: 1.9186	Loss_G: 0.6208	D(x): 0.4685	D(G(z)): 0.5844 / 0.5884
+shorter anything anything out go again out mary out prefer
+machine shopping fish it's shopping prefer mistakes mistakes everything clear
+[0/10][500/6765]	Loss_D: 1.4489	Loss_G: 0.7317	D(x): 0.5092	D(G(z)): 0.5200 / 0.4889
+. ? of <PAD> <PAD> of of way she <PAD>
+. ? of <PAD> <PAD> of of english she <PAD>
+[0/10][1000/6765]	Loss_D: 1.5700	Loss_G: 0.6301	D(x): 0.4740	D(G(z)): 0.5423 / 0.5395
+<PAD> untidy of <PAD> <PAD> <PAD> of way she <PAD>
+<PAD> make of <PAD> <PAD> poor of way his <PAD>
+[0/10][1500/6765]	Loss_D: 1.6582	Loss_G: 0.7089	D(x): 0.4185	D(G(z)): 0.5172 / 0.4994
+? untidy of <PAD> would <PAD> <EOS> way she <PAD>
+? untidy do <PAD> would <PAD> of way a <PAD>
+[0/10][2000/6765]	Loss_D: 1.4335	Loss_G: 0.6023	D(x): 0.4772	D(G(z)): 0.4932 / 0.5531
+? untidy of <PAD> would <PAD> <EOS> way a <PAD>
+? worms of <EOS> would poor of way a <PAD>
+[0/10][2500/6765]	Loss_D: 1.4116	Loss_G: 0.6416	D(x): 0.4988	D(G(z)): 0.5030 / 0.5311
+? make of <PAD> would <PAD> of way a <PAD>
+? make of <PAD> would between of way a <PAD>
+[0/10][3000/6765]	Loss_D: 1.4176	Loss_G: 0.6043	D(x): 0.4990	D(G(z)): 0.5052 / 0.5520
+? make of <PAD> would <EOS> <EOS> <EOS> a <PAD>
+? worms of <PAD> would <PAD> of imagination a <PAD>
+[0/10][3500/6765]	Loss_D: 1.4925	Loss_G: 0.6935	D(x): 0.4641	D(G(z)): 0.5117 / 0.5062
+? worms of <PAD> would <EOS> of <EOS> a <PAD>
+? worms of <EOS> would <EOS> of <EOS> a <PAD>

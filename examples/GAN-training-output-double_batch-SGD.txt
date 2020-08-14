@@ -1,0 +1,116 @@
+[0/10][0/6765]	Loss_D: 1.2532	Loss_G: 0.9674	D(x): 0.5805	D(G(z)): 0.3880 / 0.4113
+patient type beach how beach beach i'm beach lay i'm
+works saturday didn't did day i'm where i'm day didn't
+
+[0/10][500/6765]	Loss_D: 1.8554	Loss_G: 0.8588	D(x): 0.3340	D(G(z)): 0.4602 / 0.4744
+the the the the the the the the told the
+<EOS> <EOS> told told the the the the the the
+
+[0/10][1000/6765]	Loss_D: 0.7356	Loss_G: 1.5321	D(x): 0.4300	D(G(z)): 0.2719 / 0.2560
+? was was was was was was was was was
+was ? was <EOS> was was was was was was
+
+[0/10][1500/6765]	Loss_D: 1.1329	Loss_G: 0.9905	D(x): 0.3615	D(G(z)): 0.4372 / 0.4298
+get these what had had these had these these all
+room . room room had <PAD> she had a she
+
+[0/10][2000/6765]	Loss_D: 1.0340	Loss_G: 0.9917	D(x): 0.3655	D(G(z)): 0.4075 / 0.4246
+<EOS> <EOS> <EOS> <EOS> <EOS> <EOS> <EOS> <PAD> <EOS> <PAD>
+<EOS> <EOS> <EOS> <EOS> <EOS> <EOS> <EOS> <PAD> <EOS> <PAD>
+
+[0/10][2500/6765]	Loss_D: 0.5052	Loss_G: 1.1479	D(x): 0.4285	D(G(z)): 0.2124 / 0.3588
+<EOS> <EOS> <EOS> <EOS> <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
+<EOS> <EOS> <PAD> this <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[0/10][3000/6765]	Loss_D: 0.8041	Loss_G: 1.2691	D(x): 0.3898	D(G(z)): 0.2588 / 0.3544
+make <PAD> <PAD> <PAD> <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
+<PAD> two <PAD> <PAD> <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[0/10][3500/6765]	Loss_D: 0.8127	Loss_G: 1.2889	D(x): 0.4962	D(G(z)): 0.4064 / 0.3289
+make <PAD> <PAD> <PAD> <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
+<PAD> <EOS> became she <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[0/10][4000/6765]	Loss_D: 1.7598	Loss_G: 1.2665	D(x): 0.2441	D(G(z)): 0.4924 / 0.3226
+many had had had <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
+she has became we <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[0/10][4500/6765]	Loss_D: 0.9758	Loss_G: 1.1217	D(x): 0.3854	D(G(z)): 0.3430 / 0.3907
+had had had had <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
+had had had <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[0/10][5000/6765]	Loss_D: 1.9648	Loss_G: 0.9152	D(x): 0.2380	D(G(z)): 0.4111 / 0.4852
+had had . had <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
+<PAD> . . . . <EOS> <PAD> <PAD> <PAD> <PAD>
+
+[0/10][5500/6765]	Loss_D: 1.7027	Loss_G: 0.7035	D(x): 0.3383	D(G(z)): 0.6439 / 0.5379
+? had . . <EOS> <EOS> <PAD> <PAD> <PAD> <PAD>
+<EOS> . <EOS> <PAD> <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[0/10][6000/6765]	Loss_D: 1.8767	Loss_G: 0.7554	D(x): 0.2226	D(G(z)): 0.4379 / 0.5325
+? had . <EOS> <EOS> <EOS> <PAD> <PAD> <PAD> <PAD>
+? do <EOS> <EOS> . <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[0/10][6500/6765]	Loss_D: 1.4670	Loss_G: 1.0652	D(x): 0.3675	D(G(z)): 0.5710 / 0.4482
+? <PAD> . <EOS> <EOS> <EOS> <PAD> <PAD> <PAD> <PAD>
+<PAD> <PAD> . <PAD> <PAD> <PAD> <PAD> <EOS> <PAD> <PAD>
+
+[1/10][200/6765]	Loss_D: 1.1542	Loss_G: 0.8531	D(x): 0.3192	D(G(z)): 0.3987 / 0.4738
+a <PAD> <PAD> <PAD> <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
+a <PAD> do <PAD> <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[1/10][700/6765]	Loss_D: 1.0445	Loss_G: 0.7462	D(x): 0.3301	D(G(z)): 0.3349 / 0.5113
+a a <PAD> a <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
+a a <PAD> a <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[1/10][1200/6765]	Loss_D: 1.1994	Loss_G: 1.2012	D(x): 0.2868	D(G(z)): 0.3527 / 0.3810
+a a <PAD> a <EOS> <EOS> <PAD> <PAD> <PAD> <PAD>
+do do do of <EOS> <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[1/10][1700/6765]	Loss_D: 1.1608	Loss_G: 0.9547	D(x): 0.2920	D(G(z)): 0.3654 / 0.4281
+a of of <EOS> <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
+do do do do me <EOS> <EOS> <EOS> <PAD> <PAD>
+
+[1/10][2200/6765]	Loss_D: 1.1359	Loss_G: 1.1072	D(x): 0.3678	D(G(z)): 0.4271 / 0.3526
+a of of <EOS> <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
+a do do would of <EOS> <EOS> <PAD> <PAD> <PAD>
+
+[1/10][2700/6765]	Loss_D: 1.1576	Loss_G: 1.0649	D(x): 0.3175	D(G(z)): 0.4358 / 0.3829
+a of of of <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
+do do me do of of of <PAD> <PAD> <PAD>
+
+[1/10][3200/6765]	Loss_D: 1.0288	Loss_G: 1.1148	D(x): 0.3642	D(G(z)): 0.4587 / 0.3788
+a of you <EOS> <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
+a of of he <EOS> <EOS> <PAD> <PAD> <PAD> <PAD>
+
+[1/10][3700/6765]	Loss_D: 1.0123	Loss_G: 1.0623	D(x): 0.3190	D(G(z)): 0.3598 / 0.3933
+a of you <EOS> <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
+<PAD> do of of <PAD> <EOS> <EOS> <PAD> <PAD> <PAD>
+
+[1/10][4200/6765]	Loss_D: 1.4435	Loss_G: 0.9176	D(x): 0.2527	D(G(z)): 0.3805 / 0.4305
+a of <EOS> <EOS> <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
+a a worms tom <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
+
+[1/10][4700/6765]	Loss_D: 0.9756	Loss_G: 1.1618	D(x): 0.3180	D(G(z)): 0.3336 / 0.3715
+a of what <EOS> <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
+of of my of <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
+
+[1/10][5200/6765]	Loss_D: 0.8799	Loss_G: 1.0259	D(x): 0.3612	D(G(z)): 0.3258 / 0.4203
+bad of what <EOS> <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
+of my what <EOS> <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
+
+[1/10][5700/6765]	Loss_D: 0.8774	Loss_G: 1.0637	D(x): 0.3510	D(G(z)): 0.3460 / 0.3934
+bad went what ? <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
+went went would went i <EOS> <EOS> <PAD> <PAD> <PAD>
+
+[1/10][6200/6765]	Loss_D: 1.3819	Loss_G: 0.7855	D(x): 0.2565	D(G(z)): 0.4073 / 0.4889
+bad went what <EOS> <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
+<PAD> my telling <PAD> of <PAD> <PAD> <PAD> <PAD> <PAD>
+
+[1/10][6700/6765]	Loss_D: 1.2513	Loss_G: 0.7481	D(x): 0.2925	D(G(z)): 0.4506 / 0.5281
+? went <EOS> <EOS> <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
+<PAD> <PAD> <PAD> went of <EOS> <PAD> <PAD> <PAD> <PAD>
+
+[2/10][450/6765]	Loss_D: 1.3910	Loss_G: 1.1210	D(x): 0.3055	D(G(z)): 0.5396 / 0.3889
+? went <EOS> <EOS> <EOS> <EOS> <PAD> <PAD> <PAD> <PAD>
+had <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+

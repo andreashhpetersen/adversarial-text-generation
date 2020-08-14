@@ -1,0 +1,9 @@
+-----------------------------------------------------------------------------------------
+| end of epoch   5 | time: 466.09s | valid loss  3.07 | valid ppl    21.58 | train loss  2.63
+        IN:  rwandan rebels are pushing their offensive south as fighting continues in the capital kigali . <EOS>
+        OUT: honest guys are noticed their interesting south as fighting awake in the capital fortune . <EOS>
+        IN:  you don't need to answer that question . <EOS> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+        OUT: you don't need to answer that question . <EOS> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+        IN:  she has to stop smoking . <EOS> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+        OUT: she has to stop smoking . <EOS> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+-----------------------------------------------------------------------------------------
