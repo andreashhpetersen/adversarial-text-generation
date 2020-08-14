@@ -419,14 +419,12 @@ It is worth noting, that training a GAN is known to be highly non-trivial
 iterations or internal structure of the generator and/or discriminator can make
 the model collapse spectacularly.
 
-\section{Analysis}\label{sec:analysis}
+\section{Results and analysis}\label{sec:analysis}
 
 In this section, we will present and discuss our results as well as give
 suggestions for further improvements and research.
 
-\subsection{Results and discussion}\label{sec:results}
-
-\subsubsection{TransformerModel}
+\subsection{TransformerModel}
 
 As stated, we trained the TransformerModel both with and without ignoring
 padding. Generally, we achieved nice results here, with a word accuracy around
@@ -495,7 +493,7 @@ know:
 < honest guys are noticed their interesting south as fighting awake in the capital fortune . <EOS>
 \end{verbatim}
 
-\subsubsection{RNNModel}
+\subsection{RNNModel}
 
 Our RNN-based model performed much worse, than we had expected. It also took an
 extraordinary amount of time to train, so we only did so many experiments. A
@@ -533,7 +531,7 @@ sentences, but then looses track of what to do. This indicates that it hasn't
 picked up on long-term dependencies in the sentences, which might could be
 alleviated with another RNN-unit (eg.\ an LSTM) or more training.
 
-\subsubsection{GAN}
+\subsection{GAN}
 
 Now, lets look at the results of our GAN model. Because of the poor performance
 of out RNN-based autoencoder and some technical difficulties, we only trained the
@@ -828,32 +826,63 @@ indicates that is has learned the concept of sentence length and some
 consequence of an end of sequence marker (such as the punctuation mark).
 
 
-\section{Further research}\label{sec:furtherResearch}
-There are two primary areas of interest.
+\subsection{Further research and improvements}\label{sec:furtherResearch}
+We believe that the full potential of using the TransformerModel encodings in a
+GAN has yet to be revealed. Training a GAN without batching using a variable
+input length with EOS tokens, could lead to further improvements. Another
+approach to explore is using the original transformer encoder-decoder stack in
+place of the two encoder stacks approach we used.
 
-We believe that the full potential of using the TransformerModel encodings
-in a GAN has yet to be revealed. Training a GAN without batching using a variable
-input length with EOS tokens, could lead to further improvements. Another approach
-to explore is using the original transformer encoder-decoder stack in place of the two encoder stacks approach we used.
+Furthermore using a fixed size encoding such as the RnnModel makes training the
+encoder much harder but should make training the GAN much easier. As such
+getting a good Teacher model using this approach could potentially lead to large
+improvements in the GAN model. To this, it is also worth considering, that where
+some encoders might just learn to map words to some hidden state, a better
+encoder could probably inject syntax and sentence-meaning, which might also help
+a GAN model perform better.
 
-Furthermore using a fixed size encoding such as the RnnModel makes training the encoder much harder
-but should make training the GAN much easier. As such getting a good Teacher model using this
-approach could potentially lead to large improvements in the GAN model.
+There might also be advantages in systematically testing how training evolves
+with different optimizers, such as Adam, SGD, Adagrad, etc.\ and with different
+learning rates. The GAN model is clearly very fragile and it seems that very
+careful tuning of hyperparameters is needed to avoid a collapse. Maybe it would
+even be beneficial with dynamic hyperparameters that adapts to the state of the
+GAN.\
+
+Further, it would also be beneficial to get a better metric for evaluating the
+performance of the GAN.\ The loss and the output of the discriminator gives a
+hint to how the network is doing, but often it does not directly relate to how
+seemingly `good' sentences produced by the generator of the model.
 
 \section{Conclusion}\label{sec:conclusion}
-Training sentence embeddings is possible without problems,
-when the embedded size is the same size as the input.
-We achieve a 0.99 word accuracy, with room for improvement in model/training.
+We have explored two different ways of encoding sentences --- one, using a small
+Transformer encoder stack and a simple feed-forward decoding netowrk, and
+another using and RNN-based encoder and a more involved attention-based decoder.
+We achieved good results with the first, but the second one took extremely long
+to converge and only got to sub-par results.
 
-Training sentence embeddings that are decodable is difficult, when the embedded
-size has a fixed size, further research is necessary.
-We achieve promising results, but the sentences still look very messy.
+We did manage to construct a GAN model that produced sentences with some
+resemblance to the distribution it was trying to estimate. Especially, it seemed
+to be able to end sentences properly (with punctuation,
+\texttt{end-of-sequence}-tokens and padding) and its sentence-construct
+different from total randomness.
 
-Training a GAN on sentence embeddings with a variable size without
-EOS tokens is very difficult. We recommend using EOS tokens and/or possibly
-using a fixed size embedding approach.
+However, the GAN model (when trained with Adam as its optimization algorithm)
+always seemed to collapse at some point during training, where the generator
+would no longer be able to get a sentence passed the discriminator. We tried
+increasing the batch size for the generator and also to stop training the
+discriminator on encoded random words, but this only alleviated the problem so
+much. Also, we saw that not using encoded random words preserved the stability
+of the model much longer, but it became significantly worse at producing just
+seemingly meaningful sentence-constructs (especially in regards to
+\texttt{end-of-sequence}-tokens and padding).
 
-In all cases taking padding into account when training seems detrimental.
+With SGD, the model would not collapse, but instead it tended towards producing
+very short sentences with a very, very low non-sensical vocabulary.
+
+All in all, a better sentence encoding model and a more stable GAN model with
+more optimized hyperparameters and inner architecture would be needed, if the
+model were to produce sentences of any meaning to a human. As such, our model
+did not do that.
 
 \newpage
 \printbibliography%
