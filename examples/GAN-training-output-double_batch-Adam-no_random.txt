@@ -118,3 +118,30 @@ tom tom tom tom . <EOS> <EOS> <PAD> <PAD> <PAD>
 [2/10][5950/6765]	Loss_D: 1.3310	Loss_G: 0.7268	D(x): 0.5156	D(G(z)): 0.4869 / 0.4839
 . me me . . <EOS> <PAD> <PAD> <PAD> <PAD>
 . me me . . <EOS> <PAD> <PAD> <PAD> <PAD>
+[2/10][6450/6765]	Loss_D: 1.3846	Loss_G: 0.7006	D(x): 0.4988	D(G(z)): 0.4971 / 0.4972
+<EOS> . . . . <EOS> <PAD> <PAD> <PAD> <PAD>
+<EOS> . here . . <EOS> <PAD> <PAD> <PAD> <PAD>
+[3/10][200/6765]	Loss_D: 1.3366	Loss_G: 0.7089	D(x): 0.5265	D(G(z)): 0.4985 / 0.4929
+. . . . <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
+. . . . <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
+[3/10][700/6765]	Loss_D: 0.0100	Loss_G: 5.0729	D(x): 0.9973	D(G(z)): 0.0073 / 0.0072
+<PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+<PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+[3/10][1200/6765]	Loss_D: 0.0040	Loss_G: 5.7864	D(x): 0.9995	D(G(z)): 0.0035 / 0.0032
+<PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+<PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+[3/10][1700/6765]	Loss_D: 0.0023	Loss_G: 6.3552	D(x): 0.9996	D(G(z)): 0.0019 / 0.0018
+<PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+<PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+[3/10][2200/6765]	Loss_D: 0.0026	Loss_G: 6.4174	D(x): 0.9994	D(G(z)): 0.0020 / 0.0018
+<PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+<PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD> <PAD>
+[3/10][2700/6765]	Loss_D: 0.0017	Loss_G: 6.7365	D(x): 0.9996	D(G(z)): 0.0013 / 0.0013
+make make make make make make make make make make
+make make make make make make make make make make
+[3/10][3200/6765]	Loss_D: 0.0008	Loss_G: 7.6359	D(x): 0.9997	D(G(z)): 0.0005 / 0.0005
+make make make make make make make make make make
+make make make make make make make make make make
+[3/10][3700/6765]	Loss_D: 0.0012	Loss_G: 7.9275	D(x): 0.9993	D(G(z)): 0.0005 / 0.0004
+make make make make make make make make make make
+make make make make make make make make make make
