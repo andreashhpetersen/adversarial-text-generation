@@ -17,7 +17,7 @@ from pathlib import Path
 
 
 def run(padding_eos):
-    dm = DataManager(normalize_to_max_seq_len_and_eos=False, eos=True)
+    dm = DataManager(normalize_to_max_seq_len_and_eos=False)
     train_d, test_d, dev_d = dm.get_batched_data(batch_sz=8)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -201,14 +201,19 @@ def run(padding_eos):
 
         return best_model
 
-    def human_eval(i, sub_i=0):
+    def human_eval(i, sub_i=0, require_mistake=False):
         model.eval()
         ex = test_d[i][:, sub_i].view(-1, 1).to(device)
-        print("Actual:")
-        print(' '.join(dm.idx2word[w.item()] for w in ex[ex != 0]))
+        actual = ' '.join(dm.idx2word[w.item()] for w in ex[ex != 0])
         y_pred = model.predict(ex)
+        predicted = ' '.join(dm.idx2word[w.item()] for w in y_pred)
+
+        if predicted == actual and require_mistake:
+            return
+        print("Actual:")
+        print(actual)
         print("Predicted:")
-        print(' '.join(dm.idx2word[w.item()] for w in y_pred))
+        print(predicted)
 
     if padding_eos:
         path = f"saved_models/transformer-padding-eos.pt"
@@ -242,9 +247,12 @@ def run(padding_eos):
     print('| End of training | test accuray {:5.2f}'.format(test_acc))
     print('=' * 89)
 
-    for i in range(len(test_d)):
-        for i in range(len(test_d[0])):
-            human_eval(i)
+    # for i in range(len(test_d)):
+    for i in range(10):
+        human_eval(i)
+
+    for i in range(100):
+        human_eval(i, require_mistake=True)
 
     # print(model.state_dict())
 

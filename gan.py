@@ -1,5 +1,6 @@
 import copy
 import json
+import sys
 import time
 import math
 import torch
@@ -160,7 +161,7 @@ def run(padding_eos, load=False):
 
                     D_G_z1 = output.mean().item()
 
-                    if(D_G_z1 > best_D_G_z1 and D_x > 0.35):
+                    if (D_G_z1 > best_D_G_z1 and D_x > 0.35):
                         best_D_G_z1 = D_G_z1
                         best_models_1 = (copy.deepcopy(G), copy.deepcopy(D))
 
@@ -221,7 +222,8 @@ def run(padding_eos, load=False):
         torch.save(best_D2.state_dict(), f"saved_models/best2_gan_discriminator{suffix}.pt")
 
         with open(f"saved_models/gan{suffix}.stats.json", "w") as file:
-            file.write(json.dumps({"G_losses": G_losses, "D_losses": D_losses, "best_D_G_z1": best_D_G_z1, "best_D_G_z2": best_D_G_z2}))
+            file.write(json.dumps(
+                {"G_losses": G_losses, "D_losses": D_losses, "best_D_G_z1": best_D_G_z1, "best_D_G_z2": best_D_G_z2}))
 
         plt.figure(figsize=(10, 5))
         plt.title("Generator and Discriminator Loss During Training")
@@ -247,7 +249,7 @@ def run(padding_eos, load=False):
             noise = torch.randn((dm.max_seq_len, 1, emsize), device=device)
             return noise
 
-        def eval(G, noise):
+        def eval_gen(G, noise):
             with torch.no_grad():
                 G.eval()
                 fake = G(noise)
@@ -255,25 +257,24 @@ def run(padding_eos, load=False):
                 probs = F.softmax(decoded, dim=2).view(dm.max_seq_len, voc_sz)
                 print(dm.to_sentence(torch.argmax(probs, dim=1)))
 
-        return G, D, best_G1, best_D1, best_G2, best_D2, gen_noise, eval
+        return G, D, best_G1, best_D1, best_G2, best_D2, gen_noise, eval_gen
 
 
 if __name__ == '__main__':
-    G, D, best_G1, best_D1, best_G2, best_D2, gen_noise, eval = run(False, load=True)
+    if sys.argv[1] == "True":
+        G, D, best_G1, best_D1, best_G2, best_D2, gen_noise, eval_gen = run(False, load=True)
 
-    for i in range(10):
-        noise = gen_noise()
+        noises = [gen_noise() for i in range(4)]
 
-        print("Full training")
-        eval(G, noise)
+        for noise in noises:
+            eval_gen(G, noise)
+        print()
+        for noise in noises:
+            eval_gen(best_G1, noise)
+        print()
+        for noise in noises:
+            eval_gen(best_G2, noise)
         print()
 
-        print("Best 1")
-        eval(best_G1, noise)
-        print()
-
-        print("Best 2")
-        eval(best_G2, noise)
-        print()
-
-    #run(False)
+    elif sys.argv[1] == "False":
+        run(False, load=False)
