@@ -1,3 +1,4 @@
+import copy
 import json
 import time
 import math
@@ -17,7 +18,7 @@ from polyglot.mapping import Embedding, CaseExpander
 from pathlib import Path
 
 
-def run(padding_eos):
+def run(padding_eos, load=False):
     dm = DataManager(max_seq_len=15, normalize_to_max_seq_len_and_eos=True, eos=padding_eos)
     batch_size = 4
     train_d, test_d, dev_d = dm.get_batched_data(batch_sz=batch_size)
@@ -106,129 +107,173 @@ def run(padding_eos):
     D_losses = []
     iters = 0
 
-    print("Starting Training Loop...")
-    num_epochs = 10
     source_model.eval()
     source_model.requires_grad_(False)
-    best_models_1 = (G, D)
-    best_D_G_z1 = -math.inf
-    best_models_2 = (G, D)
-    best_D_G_z2 = -math.inf
-    try:
-        for epoch in range(num_epochs):
-            G.train()
-            D.train()
-            total_loss = 0.
-            start_time = time.time()
-            batch_idxs = list(range(0, len(train_d)))
-            shuffle(batch_idxs)
-            for i, batch_idx in enumerate(batch_idxs):
-                batch = train_d[batch_idx].to(device)
-                batch_sz = batch.shape[1]
 
-                ############################
-                # (1) Update D network: maximize log(D(x)) + log(1 - D(G(z)))
-                ###########################
-                ## Train with all-real batch
-                D.zero_grad()
-                encoded_batch = source_model.encode(batch)
-                label = torch.full((batch_sz,), real_label, device=device)
-                output_real = D(encoded_batch)
-                errD_real = criterion(output_real, label)
-                errD_real.backward()
+    if not load:
+        print("Starting Training Loop...")
+        num_epochs = 10
+        best_models_1 = (G, D)
+        best_D_G_z1 = -math.inf
+        best_models_2 = (G, D)
+        best_D_G_z2 = -math.inf
+        try:
+            for epoch in range(num_epochs):
+                G.train()
+                D.train()
+                total_loss = 0.
+                start_time = time.time()
+                batch_idxs = list(range(0, len(train_d)))
+                shuffle(batch_idxs)
+                for i, batch_idx in enumerate(batch_idxs):
+                    batch = train_d[batch_idx].to(device)
+                    batch_sz = batch.shape[1]
 
-                ## Train with all-fake batch from encoder
-                encoded_fakes = source_model.encode(random_words(batch))
-                label.fill_(fake_label)
-                output_fake = D(encoded_fakes)
-                errD_fake_encoded = criterion(output_fake, label)
-                errD_fake_encoded.backward()
+                    ############################
+                    # (1) Update D network: maximize log(D(x)) + log(1 - D(G(z)))
+                    ###########################
+                    ## Train with all-real batch
+                    D.zero_grad()
+                    encoded_batch = source_model.encode(batch)
+                    label = torch.full((batch_sz,), real_label, device=device)
+                    output_real = D(encoded_batch)
+                    errD_real = criterion(output_real, label)
+                    errD_real.backward()
 
-                D_x = torch.cat([output_real, output_fake]).mean().item()
+                    ## Train with all-fake batch from encoder
+                    encoded_fakes = source_model.encode(random_words(batch))
+                    label.fill_(fake_label)
+                    output_fake = D(encoded_fakes)
+                    errD_fake_encoded = criterion(output_fake, label)
+                    errD_fake_encoded.backward()
 
-                ## Train with all-fake batch
-                label.fill_(fake_label)
-                noise = torch.randn((dm.max_seq_len, batch_sz, emsize), device=device)
+                    D_x = torch.cat([output_real, output_fake]).mean().item()
+
+                    ## Train with all-fake batch
+                    label.fill_(fake_label)
+                    noise = torch.randn((dm.max_seq_len, batch_sz, emsize), device=device)
+                    fake = G(noise)
+                    output = D(fake.detach()).view(-1)
+                    errD_fake = criterion(output, label)
+                    errD_fake.backward()
+                    errD = errD_real + errD_fake
+
+                    D_G_z1 = output.mean().item()
+
+                    if(D_G_z1 > best_D_G_z1 and D_x > 0.35):
+                        best_D_G_z1 = D_G_z1
+                        best_models_1 = (copy.deepcopy(G), copy.deepcopy(D))
+
+                    # Update D
+                    optimizerD.step()
+
+                    ############################
+                    # (2) Update G network: maximize log(D(G(z)))
+                    ###########################
+                    G.zero_grad()
+
+                    label.fill_(real_label)
+                    output = D(fake).view(-1)
+                    errG = criterion(output, label)
+                    errG.backward()
+                    D_G_z2 = output.mean().item()
+
+                    if (D_G_z2 > best_D_G_z2 and D_x > 0.35):
+                        best_D_G_z2 = D_G_z2
+                        best_models_2 = (copy.deepcopy(G), copy.deepcopy(D))
+
+                    # Update G
+                    optimizerG.step()
+
+                    # Output training stats
+                    if i % 50 == 0:
+                        print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f'
+                              % (epoch, num_epochs, i, len(batch_idxs),
+                                 errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
+
+                    # Save Losses for plotting later
+                    G_losses.append(errG.item())
+                    D_losses.append(errD.item())
+
+                    # Check how the generator is doing by saving G's output on fixed_noise
+                    if (iters % 500 == 0) or ((epoch == num_epochs - 1) and (i == len(batch_idxs) - 1)):
+                        with torch.no_grad():
+                            G.eval()
+                            fake = G(fixed_noise).detach()
+                            decoded = source_model.decode(fake)
+                            probs = F.softmax(decoded, dim=2).view(dm.max_seq_len, voc_sz)
+                            print(dm.to_sentence(torch.argmax(probs, dim=1)))
+
+                    iters += 1
+        except KeyboardInterrupt:
+            print('-' * 89)
+            print('Exiting from training early')
+
+        torch.save(G.state_dict(), f"saved_models/gan_generator{suffix}.pt")
+        torch.save(D.state_dict(), f"saved_models/gan_discriminator{suffix}.pt")
+
+        best_G1, best_D1 = best_models_1
+        torch.save(best_G1.state_dict(), f"saved_models/best1_gan_generator{suffix}.pt")
+        torch.save(best_D1.state_dict(), f"saved_models/best1_gan_discriminator{suffix}.pt")
+
+        best_G2, best_D2 = best_models_2
+        torch.save(best_G2.state_dict(), f"saved_models/best2_gan_generator{suffix}.pt")
+        torch.save(best_D2.state_dict(), f"saved_models/best2_gan_discriminator{suffix}.pt")
+
+        with open(f"saved_models/gan{suffix}.stats.json", "w") as file:
+            file.write(json.dumps({"G_losses": G_losses, "D_losses": D_losses, "best_D_G_z1": best_D_G_z1, "best_D_G_z2": best_D_G_z2}))
+
+        plt.figure(figsize=(10, 5))
+        plt.title("Generator and Discriminator Loss During Training")
+        plt.plot(G_losses, label="G")
+        plt.plot(D_losses, label="D")
+        plt.xlabel("iterations")
+        plt.ylabel("Loss")
+        plt.legend()
+        plt.show()
+    else:
+        G.load_state_dict(torch.load(f"saved_models/gan_generator{suffix}.pt"))
+        D.load_state_dict(torch.load(f"saved_models/gan_discriminator{suffix}.pt"))
+
+        best_G1, best_D1 = copy.deepcopy(G), copy.deepcopy(D)
+        best_G1.load_state_dict(torch.load(f"saved_models/best1_gan_generator{suffix}.pt"))
+        best_D1.load_state_dict(torch.load(f"saved_models/best1_gan_discriminator{suffix}.pt"))
+
+        best_G2, best_D2 = copy.deepcopy(G), copy.deepcopy(D)
+        best_G2.load_state_dict(torch.load(f"saved_models/best2_gan_generator{suffix}.pt"))
+        best_D2.load_state_dict(torch.load(f"saved_models/best2_gan_discriminator{suffix}.pt"))
+
+        def gen_noise():
+            noise = torch.randn((dm.max_seq_len, 1, emsize), device=device)
+            return noise
+
+        def eval(G, noise):
+            with torch.no_grad():
+                G.eval()
                 fake = G(noise)
-                output = D(fake.detach()).view(-1)
-                errD_fake = criterion(output, label)
-                errD_fake.backward()
-                errD = errD_real + errD_fake
+                decoded = source_model.decode(fake)
+                probs = F.softmax(decoded, dim=2).view(dm.max_seq_len, voc_sz)
+                print(dm.to_sentence(torch.argmax(probs, dim=1)))
 
-                D_G_z1 = output.mean().item()
-
-                if(D_G_z1 > best_D_G_z1 and D_x > 0.35):
-                    best_D_G_z1 = D_G_z1
-                    best_models_1 = (G, D)
-
-                # Update D
-                optimizerD.step()
-
-                ############################
-                # (2) Update G network: maximize log(D(G(z)))
-                ###########################
-                G.zero_grad()
-
-                label.fill_(real_label)
-                output = D(fake).view(-1)
-                errG = criterion(output, label)
-                errG.backward()
-                D_G_z2 = output.mean().item()
-
-                if (D_G_z2 > best_D_G_z2 and D_x > 0.35):
-                    best_D_G_z2 = D_G_z2
-                    best_models_2 = (G, D)
-
-                # Update G
-                optimizerG.step()
-
-                # Output training stats
-                if i % 50 == 0:
-                    print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f'
-                          % (epoch, num_epochs, i, len(batch_idxs),
-                             errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
-
-                # Save Losses for plotting later
-                G_losses.append(errG.item())
-                D_losses.append(errD.item())
-
-                # Check how the generator is doing by saving G's output on fixed_noise
-                if (iters % 500 == 0) or ((epoch == num_epochs - 1) and (i == len(batch_idxs) - 1)):
-                    with torch.no_grad():
-                        G.eval()
-                        fake = G(fixed_noise).detach()
-                        decoded = source_model.decode(fake)
-                        probs = F.softmax(decoded, dim=2).view(dm.max_seq_len, voc_sz)
-                        print(dm.to_sentence(torch.argmax(probs, dim=1)))
-
-                iters += 1
-    except KeyboardInterrupt:
-        print('-' * 89)
-        print('Exiting from training early')
-
-    torch.save(G.state_dict(), f"saved_models/gan_generator{suffix}.pt")
-    torch.save(D.state_dict(), f"saved_models/gan_discriminator{suffix}.pt")
-
-    best_G1, best_D1 = best_models_1
-    torch.save(best_G1.state_dict(), f"saved_models/best1_gan_generator{suffix}.pt")
-    torch.save(best_D1.state_dict(), f"saved_models/best1_gan_discriminator{suffix}.pt")
-
-    best_G2, best_D2 = best_models_2
-    torch.save(best_G2.state_dict(), f"saved_models/best2_gan_generator{suffix}.pt")
-    torch.save(best_D2.state_dict(), f"saved_models/best2_gan_discriminator{suffix}.pt")
-
-    with open(f"saved_models/gan{suffix}.stats.json", "w") as file:
-        file.write(json.dumps({"G_losses": G_losses, "D_losses": D_losses, "best_D_G_z1": best_D_G_z1, "best_D_G_z2": best_D_G_z2}))
-
-    plt.figure(figsize=(10, 5))
-    plt.title("Generator and Discriminator Loss During Training")
-    plt.plot(G_losses, label="G")
-    plt.plot(D_losses, label="D")
-    plt.xlabel("iterations")
-    plt.ylabel("Loss")
-    plt.legend()
-    plt.show()
+        return G, D, best_G1, best_D1, best_G2, best_D2, gen_noise, eval
 
 
 if __name__ == '__main__':
-    run(False)
+    G, D, best_G1, best_D1, best_G2, best_D2, gen_noise, eval = run(False, load=True)
+
+    for i in range(10):
+        noise = gen_noise()
+
+        print("Full training")
+        eval(G, noise)
+        print()
+
+        print("Best 1")
+        eval(best_G1, noise)
+        print()
+
+        print("Best 2")
+        eval(best_G2, noise)
+        print()
+
+    #run(False)
