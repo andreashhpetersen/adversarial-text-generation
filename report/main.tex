@@ -201,7 +201,7 @@ see~\cite{donahue2018adversarial} and~\cite{haidar2019textkdgan}.
 
 For all our models (autoencoders and GANs), we drew inspiration PyTorch
 tutorials
-(\cite{pytorchTutorialAtt}, ~\cite{pytorchTutorialTransformer}, ~\cite{pytorchTutorialGAN}),
+(\cite{pytorchTutorialAtt},~\cite{pytorchTutorialTransformer},~\cite{pytorchTutorialGAN}),
 tweaking them to our specific needs. The whole process (project development,
 research, data collection, coding, training, experimentation and analysis) was
 conducted during a 10-day period.
@@ -338,8 +338,8 @@ the models.
 There were some notable differences between the way we trained the
 TransformerModel and the RNN-based model. For the TransformerModel we had good
 results with a learning rate of 0.05, and we performed training on the entire
-training set in batches of 8 and over the course of 100 epochs. We also trained
-it another time with just 10 epochs, but this time without ignoring the padding
+training set in batches of 8 and over the course of 25 epochs. We also trained
+it another time with just 5 epochs, but this time without ignoring the padding
 in the batches (when batching the data, not all sentences have the same length
 and the smaller sentences are padded with the special \texttt{<PAD>}-token).
 This makes the model achieve a lower loss much faster, as it quickly learns the
@@ -426,21 +426,27 @@ suggestions for further improvements and research.
 \subsection{Results}\label{sec:results}
 
 \subsubsection{TransformerModel}
-Plots of loss during training.
+As stated, we trained the TransformerModel both with and without ignoring
+padding. Generally, we achieved nice results here, with a word accuracy around
+99\%. In Figure~\ref{fig:transformerLossNoPadding}
+and~\ref{fig:transformerLossPaddingEOS} we have plotted the loss.
 
 \begin{figure}[h]
     \centering
     \begin{minipage}{0.45\textwidth}
+        \captionsetup{width=0.8\textwidth}
         \includegraphics[width=0.9\textwidth]{transformer.png}
         \caption{%
             Loss of the standard TransformerModel
-        }\label{fig:transformer}
+        }\label{fig:transformerLossNoPadding}
     \end{minipage}
     \begin{minipage}{0.45\textwidth}
+        \captionsetup{width=0.8\textwidth}
         \includegraphics[width=0.9\textwidth]{transformer_padding-eos.png}
         \caption{%
-            Loss of the TransformerModel that takes padding into account and has EOS tokens
-        }\label{fig:transformerPaddingEOS}
+            Loss of the TransformerModel that takes padding into account and has
+            EOS tokens. Even with way fewer epochs, the results were very good.
+        }\label{fig:transformerLossPaddingEOS}
     \end{minipage}
 \end{figure}
 
@@ -454,7 +460,7 @@ Plots of loss during training.
 %OUT: honest guys are noticed their interesting south as fighting awake in
 %\end{verbatim}
 
-The TransformerModel ends up with a word accuracy of 0.99, here are some test examples:
+The following are some examples of how the model performed on specific inputs:
 
 \begin{verbatim}
 ++++++ Successful encoding ++++++
@@ -472,17 +478,48 @@ The TransformerModel ends up with a word accuracy of 0.99, here are some test ex
 < you have the right to free speech , but not the right to limits .
 \end{verbatim}
 
-\subsubsection{RnnModel}
+And here are some examples of the model when train with padding and
+\texttt{end-of-sequence}-token:
+
+\begin{verbatim}
+> his house was small and old . <EOS>
+< his house was small and old . <EOS>
+
+> i realized what was happening . <EOS> <PAD>
+< i realized what was happening . <EOS> <PAD>
+
+> there is no museum . <EOS> <PAD> <PAD> <PAD>
+< there is no antidote . <EOS> <PAD> <PAD> <PAD>
+\end{verbatim}
+
+Notice the error in the last sentence. For good measure, we report the following
+input/output-pair that was observed during training. Maybe the model were
+developing a political opinion, maybe it was joking. We will probably never
+know:
+
+\begin{verbatim}
+> rwandan rebels are pushing their offensive south as fighting continues in the capital kigali . <EOS>
+< honest guys are noticed their interesting south as fighting awake in the capital fortune . <EOS>
+\end{verbatim}
+
+\subsubsection{RNNModel}
+
+Our RNN-based model performed much worse, than we had expected. It also took an
+extraordinary amount of time to train, so we only did so many experiments. A
+plot of the loss can be seen in Figure~\ref{fig:rnnLoss}. 
 
 \begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.9\textwidth]{loss_from_last_few_trainings_rnn.png}
+    \captionsetup{width=0.8\textwidth}
+    \includegraphics[width=0.9\textwidth, height=15cm]{RNN-loss-part1.png}
     \caption{%
-        Loss of RnnModel while training
-    }\label{fig:rnn}
+        Training loss of RNN-based attention model.
+    }\label{fig:rnnLoss}
 \end{figure}
 
-Test examples:
+We trained the same model several times with decreasing batch size, and even
+though the loss kept going down, the following examples show that the end result
+was not amazing:
+
 \begin{verbatim}
 > tom got to the station too late so he missed the train . <EOS> <PAD>
 < tom got to the so so so he opened the same . <EOS>
@@ -497,23 +534,147 @@ Test examples:
 < i can't believe that you were a a the in the . . <EOS>
 \end{verbatim}
 
+It has clearly learned something, most notably \texttt{end-of-sequence}-tokens
+and padding. Further, it seems that it does a fine job in the beginning of
+sentences, but then looses track of what to do. This indicates that it hasn't
+picked up on long-term dependencies in the sentences, which might could be
+alleviated with another RNN-unit (eg.\ an LSTM) or more training.
+
 \subsubsection{GAN}
 
-\begin{figure}[h]
-    \centering
+Now, lets look at the results of our GAN model. Because of the poor performance
+of out RNN-based autoencoder and some technical difficulties, we only trained the
+GAN against the TransformerModel. Also, we set the maximum sequence length to be
+10 which is fine for prototyping and evaluating if anything is actually learned.
+
+Beginning with Figure~\ref{fig:ganLossAdam} and Figure~\ref{fig:ganLossSGD} we
+see how the networked performed when trained with Adam and Stochastic Gradient
+Descent respectively as its training algorithm. The difference is very clear:
+for Adam, the generator and the discriminator has a pretty consistent
+relationsship until suddenly, the discriminator seem to figure out how to call
+bluff on the generator, and the generator has no answer to that. The loss goes
+way up for the generator and it falls to a minimum for the discriminator and the
+model seem to collapse.
+
+For SGD, the model is in some sense way more stable and the loss for both the
+discriminator and the generator stays in same limited interval. 
+
+\begin{figure}[ht]
     \begin{minipage}{0.45\textwidth}
-        \includegraphics[width=0.9\textwidth]{gan.png}
+        \includegraphics[width=\textwidth, height=5cm]{GAN-loss-Adam.png}
         \caption{%
-            Loss of the GAN using the standard TransformerModel
-        }\label{fig:gan}
+            GAN loss using Adam
+        }\label{fig:ganLossAdam}
     \end{minipage}
     \begin{minipage}{0.45\textwidth}
-        \includegraphics[width=0.9\textwidth]{GAN-loss-double_batch-Adam-no_random.png}
+        \includegraphics[width=\textwidth, height=5cm]{GAN-loss-SGD.png}
         \caption{%
-            Loss of the GAN using the TransformerModel that takes padding into account and has EOS tokens
-        }\label{fig:ganPaddingEOS}
+            GAN loss using SGD
+        }\label{fig:ganLossSGD}
     \end{minipage}
 \end{figure}
+
+Since what we really wanted was a strong generator, and this seemed to be the
+component that failed, we tried training with a double batch for the generator
+to give an edge against the discriminator. The resulting loss is seen in
+Figure~\ref{fig:ganLossAdamDoubleBatch} and
+Figure~\ref{fig:ganLossSGDDoubleBatch}. The pattern is the same, but this time,
+the Adam model collapses faster.
+
+\begin{figure}[ht]
+    \begin{minipage}{0.45\textwidth}
+        \captionsetup{width=0.8\textwidth}
+        \includegraphics[width=\textwidth, height=5cm]{GAN-loss-double_batch-Adam.png}
+        \caption{%
+            GAN loss using Adam and double batch for generator
+        }\label{fig:ganLossAdamDoubleBatch}
+    \end{minipage}
+    \begin{minipage}{0.45\textwidth}
+        \captionsetup{width=0.8\textwidth}
+        \includegraphics[width=\textwidth, height=5cm]{GAN-loss-double_batch-SGD.png}
+        \caption{%
+            GAN loss using SGD and double batch for generator
+        }\label{fig:ganLossSGDDoubleBatch}
+    \end{minipage}
+\end{figure}
+
+Looking at the actual output, we some interesting results. First, lets look at
+some output from the Adam training (without double batch):
+
+\begin{verbatim}
+[0/10][0/6765]      Loss_D: 1.8526  Loss_G: 0.6623  D(x): 0.5776    D(G(z)): 0.5878 / 0.5499
+know for know i'm i'm the for good some i'm
+
+[0/10][500/6765]    Loss_D: 1.7199  Loss_G: 0.6846  D(x): 0.2188    D(G(z)): 0.5105 / 0.5054
+your appropriated make ? but <PAD> <EOS> <EOS> <PAD> <PAD>
+
+[0/10][2000/6765]   Loss_D: 1.2057  Loss_G: 0.9821  D(x): 0.2932    D(G(z)): 0.4748 / 0.3959
+your out out out out out <EOS> <EOS> <PAD> <PAD>
+
+...
+
+[2/10][2450/6765]       Loss_D: 1.4581  Loss_G: 1.7943  D(x): 0.2807    D(G(z)): 0.1915 / 0.1928
+tom cats a a stayed . <EOS> <PAD> <PAD> <PAD>
+
+[2/10][2950/6765]       Loss_D: 0.4975  Loss_G: 1.7132  D(x): 0.3910    D(G(z)): 0.0857 / 0.2305
+he who painted is is . <EOS> <PAD> <PAD> <PAD>
+
+[2/10][3450/6765]       Loss_D: 0.4640  Loss_G: 6.3138  D(x): 0.3933    D(G(z)): 0.1249 / 0.0479
+don't child caught more my . . <EOS> <PAD> <PAD>
+\end{verbatim}
+
+These are outputs that show, what the loss of the discriminator (Loss\_D), the
+loss of the generator (Loss\_G), the average discriminator output on
+non-generated data (D(x)) and the average discriminator output on the
+generated data before and after updating the discriminator (D(G(z))). We see
+that the model learns the structure of \texttt{end-of-sequence}-tokens, padding
+and to some extent punctuation. The sentences are clearly nonsense, but they
+do not seem totally random. Compare the later outputs with the first and these
+points are more clear.
+
+We also notice, that $D(G(z))$ become very low towards the end here. This means
+that the discriminator correctly classifies nearly all the generated sentences. 
+
+Now lets look at the output for the SGD training:
+
+\begin{verbatim}
+[0/10][0/6765]    Loss_D: 1.6203    Loss_G: 1.6716    D(x): 0.2540    D(G(z)): 0.2270 / 0.2125
+. where ? where long where where say long where
+
+[0/10][500/6765]    Loss_D: 1.3528    Loss_G: 1.0269    D(x): 0.3616    D(G(z)): 0.4392 / 0.3740
+
+[0/10][3000/6765]    Loss_D: 1.4074    Loss_G: 0.8827    D(x): 0.2683    D(G(z)): 0.3572 / 0.4423
+. why the this this <PAD> <PAD> <PAD> <PAD> <PAD>
+
+...
+
+[1/10][6200/6765]    Loss_D: 1.3663    Loss_G: 0.9820    D(x): 0.2959    D(G(z)): 0.4286 / 0.4028
+. a he a <EOS> <EOS> <PAD> <PAD> <PAD> <PAD>
+
+[1/10][6700/6765]    Loss_D: 1.0762    Loss_G: 0.9794    D(x): 0.3373    D(G(z)): 0.4294 / 0.4404
+. a he why <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
+
+[2/10][450/6765]    Loss_D: 0.8063    Loss_G: 0.8995    D(x): 0.3487    D(G(z)): 0.3294 / 0.4373
+. a he a <EOS> <EOS> <EOS> <PAD> <PAD> <PAD>
+<EOS> <EOS> <EOS> do is <EOS> <EOS> <EOS> <PAD> <PAD>
+
+
+\end{verbatim}
+
+\begin{figure}[ht]
+    \centering
+    \captionsetup{width=0.7\textwidth}
+    \includegraphics[width=0.9\textwidth, height=10cm]{GAN-loss-double_batch-Adam-no_random.png}
+    \caption{%
+        Loss of the GAN using the TransformerModel that takes padding into
+        account and has EOS tokens
+    }\label{fig:ganPaddingEOS}
+\end{figure}
+
+
+
+
+
 
 Output of the model with the highest $D(G(z))$ while still having a $D(x) > 0.35$:
 \scriptsize
