@@ -218,7 +218,7 @@ def run(padding_eos):
     torch.save(best_D2.state_dict(), f"saved_models/best2_gan_discriminator{suffix}.pt")
 
     with open(f"saved_models/gan{suffix}.stats.json", "w") as file:
-        json.dumps({"G_losses": G_losses, "D_losses": D_losses, "best_D_G_z1": best_D_G_z1, "best_D_G_z2": best_D_G_z2})
+        file.write(json.dumps({"G_losses": G_losses, "D_losses": D_losses, "best_D_G_z1": best_D_G_z1, "best_D_G_z2": best_D_G_z2}))
 
     plt.figure(figsize=(10, 5))
     plt.title("Generator and Discriminator Loss During Training")
